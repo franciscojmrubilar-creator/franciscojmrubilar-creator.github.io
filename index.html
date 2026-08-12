@@ -18,6 +18,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         /* --- ESTILOS GENERALES Y PALETA PREMIUM --- */
         :root {
@@ -40,7 +43,7 @@
             margin: 0 auto; 
             padding: 20px; 
             font-weight: 400;
-            -webkit-tap-highlight-color: transparent; /* Quita el destello azul al tocar en iOS */
+            -webkit-tap-highlight-color: transparent; 
         }
         
         h1, h2, h3, h4 {
@@ -262,7 +265,6 @@
             .config-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; }
             .btn-add-ramo { width: 100%; }
 
-            /* ARREGLO DE ENCABEZADO SUPERPUESTO */
             .ramo-header-acordeon { 
                 flex-wrap: wrap; 
                 padding: 20px 15px; 
@@ -404,6 +406,12 @@
     </div>
 
     <script>
+        // --- INICIALIZAR SUPABASE ---
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://wcjusgohdhziakgnrqhy.supabase.co'; 
+        const supabaseKey = 'sb_publishable_kn0SGoGHKL8jpEEfPjfIqw_UslM23iQ';
+        const supabaseApp = createClient(supabaseUrl, supabaseKey);
+
         // --- NAVEGACIÓN ---
         function cambiarSeccion(idSeccion, btn) {
             document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
@@ -441,24 +449,61 @@
                     { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" },
                     { id: 2, nombre: "Certamen 2", nota: "", porcentaje: "30" }
                 ]
-            },
-            {
-                id: 3, nombre: "Ecuaciones Diferenciales", notaAprobacion: 4.0, maxRojas: 99,
-                evaluaciones: [
-                    { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "35" }
-                ]
             }
         ];
 
-        let ramosDatosLocales = localStorage.getItem('notas_uni_datos');
-        let ramos = ramosDatosLocales ? JSON.parse(ramosDatosLocales) : ramosDefaultNotas;
+        const eventosDefault = [
+            { id: 1, nombre: "Certamen 1 - Ecuaciones Diferenciales", fecha: "2026-08-15", color: "#1A1A1A" },
+            { id: 2, nombre: "Laboratorio - Termodinámica", fecha: "2026-08-20", color: "#3E5A45" }
+        ];
+
+        let ramos = [];
+        let eventosCalendario = [];
         
         let estadoLock = localStorage.getItem('notas_uni_lock');
         let modoBloqueado = estadoLock !== null ? estadoLock === 'true' : true; 
 
-        function guardarDatosNotas() { 
-            localStorage.setItem('notas_uni_datos', JSON.stringify(ramos)); 
+        // Descarga inicial desde la Nube
+        async function cargarDatosDesdeNube() {
+            try {
+                const { data, error } = await supabaseApp
+                    .from('panel_datos')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (data) {
+                    ramos = data.ramos || ramosDefaultNotas;
+                    eventosCalendario = data.calendario || eventosDefault;
+                } else {
+                    ramos = ramosDefaultNotas;
+                    eventosCalendario = eventosDefault;
+                }
+            } catch (e) {
+                ramos = ramosDefaultNotas;
+                eventosCalendario = eventosDefault;
+            }
+
+            renderizarNotas();
+            renderizarCalendario();
+            renderizarFechasPendientes();
+        }
+
+        // Subida de datos a la nube
+        async function guardarDatosNotas() { 
+            await supabaseApp.from('panel_datos').upsert({ 
+                id: 1, 
+                ramos: ramos 
+            });
             renderizarFechasPendientes(); 
+        }
+
+        async function guardarEventos() { 
+            await supabaseApp.from('panel_datos').upsert({ 
+                id: 1, 
+                calendario: eventosCalendario 
+            });
+            renderizarFechasPendientes();
         }
         
         function toggleBloqueo(estado) { 
@@ -596,7 +641,7 @@
                                 <input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}>
                             </div>
                             <div class="header-actions">
-                                <button class="btn-remove" style="margin-right: 15px;" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
+                                <button class="btn-remove" style="margin-right: 15px; padding: 10px 15px;" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
                                 <div style="padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                     <span class="arrow"></span>
                                 </div>
@@ -633,7 +678,7 @@
                         </div>
                     </div>`;
             });
-            guardarDatosNotas();
+            guardarDatosNotas(); // Esto ahora sube a Supabase!
         }
 
         function agregarRamo() { 
@@ -656,7 +701,7 @@
         }
 
         function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); } }
-        function actRamo(i, v) { ramos[i].nombre = v; guardarDatosNotas(); }
+        function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); }
         
         function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false }); renderizarNotas(); }
         function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, subNotas: [""] }); renderizarNotas(); }
@@ -701,26 +746,12 @@
         // ==========================================
         // LÓGICA SECCIÓN 2: CALENDARIO Y FECHAS
         // ==========================================
-        const eventosDefault = [
-            { id: 1, nombre: "Certamen 1 - Ecuaciones Diferenciales", fecha: "2026-08-15", color: "#1A1A1A" },
-            { id: 2, nombre: "Laboratorio - Termodinámica", fecha: "2026-08-20", color: "#3E5A45" },
-            { id: 3, nombre: "Certamen 1 - Estática", fecha: "2026-08-28", color: "#9E7235" },
-            { id: 4, nombre: "Certamen 2 - Ecuaciones Diferenciales", fecha: "2026-09-15", color: "#1A1A1A" }
-        ];
-
-        let eventosCalendario = JSON.parse(localStorage.getItem('calendario_eventos')) || eventosDefault;
-        
         let fechaActual = new Date(); 
         let mesActual = fechaActual.getMonth(); 
         let anioActual = fechaActual.getFullYear();
 
         const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
         const diasSemana = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
-
-        function guardarEventos() { 
-            localStorage.setItem('calendario_eventos', JSON.stringify(eventosCalendario)); 
-            renderizarFechasPendientes();
-        }
 
         function cambiarMes(direccion) {
             mesActual += direccion;
@@ -826,7 +857,7 @@
             if(!nombre || !fecha) { alert("Completa el nombre y la fecha."); return; }
 
             eventosCalendario.push({ id: Date.now(), nombre, fecha, color });
-            guardarEventos();
+            guardarEventos(); // Sube a Supabase
 
             const partes = nombre.split('-');
             const tituloEv = partes[0].trim();
@@ -843,7 +874,7 @@
                 ramos.push({ nombre: nombreRamo, notaAprobacion: 4.0, maxRojas: 99, evaluaciones: [{ nombre: tituloEv, nota: "", porcentaje: "" }] });
             }
             
-            renderizarNotas();
+            renderizarNotas(); // El renderizar llama al guardar notas (Supabase)
             document.getElementById('ev-nombre').value = '';
             document.getElementById('ev-fecha').value = '';
             renderizarCalendario();
@@ -932,10 +963,8 @@
             document.getElementById('modal-evaluacion').classList.add('oculto');
         }
 
-        // Iniciar
-        renderizarNotas();
-        renderizarCalendario();
-        renderizarFechasPendientes();
+        // --- INICIO DE APLICACIÓN CON SUPABASE ---
+        cargarDatosDesdeNube();
 
     </script>
 </body>
