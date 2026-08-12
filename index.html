@@ -160,6 +160,8 @@
 
         .btn-remove { background-color: transparent; color: var(--rojo-muteado); border: 1px solid var(--rojo-muteado); padding: 12px 15px; }
         .btn-remove:hover { background-color: var(--rojo-muteado); color: var(--blanco); }
+        
+        .btn-remove-ramo { margin-right: 15px; }
         .btn-remove-sub { padding: 10px 12px; }
 
         .resultados { 
@@ -279,7 +281,7 @@
                 width: 100%; 
                 justify-content: space-between; 
             }
-            .header-actions .btn-remove { margin-right: 0 !important; }
+            .header-actions .btn-remove-ramo { margin-right: 0 !important; }
 
             .ramo-body { padding: 20px 15px; }
 
@@ -641,7 +643,7 @@
                                 <input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}>
                             </div>
                             <div class="header-actions">
-                                <button class="btn-remove" style="margin-right: 15px; padding: 10px 15px;" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
+                                <button class="btn-remove btn-remove-ramo" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
                                 <div style="padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                     <span class="arrow"></span>
                                 </div>
@@ -678,7 +680,7 @@
                         </div>
                     </div>`;
             });
-            guardarDatosNotas(); // Esto ahora sube a Supabase!
+            guardarDatosNotas(); 
         }
 
         function agregarRamo() { 
@@ -857,7 +859,7 @@
             if(!nombre || !fecha) { alert("Completa el nombre y la fecha."); return; }
 
             eventosCalendario.push({ id: Date.now(), nombre, fecha, color });
-            guardarEventos(); // Sube a Supabase
+            guardarEventos(); 
 
             const partes = nombre.split('-');
             const tituloEv = partes[0].trim();
@@ -874,7 +876,7 @@
                 ramos.push({ nombre: nombreRamo, notaAprobacion: 4.0, maxRojas: 99, evaluaciones: [{ nombre: tituloEv, nota: "", porcentaje: "" }] });
             }
             
-            renderizarNotas(); // El renderizar llama al guardar notas (Supabase)
+            renderizarNotas(); 
             document.getElementById('ev-nombre').value = '';
             document.getElementById('ev-fecha').value = '';
             renderizarCalendario();
