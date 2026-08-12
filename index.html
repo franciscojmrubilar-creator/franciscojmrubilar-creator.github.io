@@ -220,7 +220,7 @@
 
             /* Contenedor sub-tests */
             .sub-evaluacion-container { margin-left: 5px; padding: 10px; }
-            .sub-evaluacion-row { flex-wrap: nowrap; } /* Mantener en una línea para que no se vea desordenado */
+            .sub-evaluacion-row { flex-wrap: nowrap; } 
             .sub-evaluacion-row span { width: 50px; font-size: 0.8em; }
 
             /* Resultados finales */
@@ -373,7 +373,11 @@
 
         let ramosDatosLocales = localStorage.getItem('notas_uni_datos');
         let ramos = ramosDatosLocales ? JSON.parse(ramosDatosLocales) : ramosDefaultNotas;
-        let modoBloqueado = localStorage.getItem('notas_uni_lock') === 'true';
+        
+        // --- CORRECCIÓN DE ESTADO INICIAL ---
+        let estadoLock = localStorage.getItem('notas_uni_lock');
+        // Si no hay configuración guardada, iniciará como "true" (bloqueado) por defecto
+        let modoBloqueado = estadoLock !== null ? estadoLock === 'true' : true; 
 
         function guardarDatosNotas() { 
             localStorage.setItem('notas_uni_datos', JSON.stringify(ramos)); 
