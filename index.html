@@ -5,17 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Panel Universitario</title>
     
+    <!-- Configuración para iPhone (Safari) / PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Panel U">
+    <!-- Icono dinámico elegante (Fondo negro, Letra Beige) -->
     <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
     <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
 
+    <!-- Fuente Inter de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
+        /* --- ESTILOS GENERALES Y PALETA PREMIUM --- */
         :root {
             --bg-beige: #F5F3EC;
             --beige-oscuro: #E5E0D8;
@@ -39,13 +46,28 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        h1, h2, h3, h4 { text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: var(--negro); }
+        h1, h2, h3, h4 {
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: var(--negro);
+        }
+
         h1 { text-align: center; margin-bottom: 30px; font-size: 2em; letter-spacing: 3px; }
+
         input { font-size: 16px; font-family: 'Inter', sans-serif; }
         button { min-height: 40px; font-family: 'Inter', sans-serif; }
 
-        .navbar { display: flex; gap: 10px; background: var(--negro); padding: 15px; border-radius: 4px; margin-bottom: 40px; overflow-x: auto; }
-        .nav-btn { background: transparent; color: var(--gris-claro); border: none; padding: 10px 20px; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.9em; white-space: nowrap; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        /* --- MENÚ DE NAVEGACIÓN --- */
+        .navbar {
+            display: flex; gap: 10px; background: var(--negro); padding: 15px; border-radius: 4px; 
+            margin-bottom: 40px; overflow-x: auto; 
+        }
+        .nav-btn {
+            background: transparent; color: var(--gris-claro); border: none; padding: 10px 20px; 
+            border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.9em; 
+            white-space: nowrap; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
         .nav-btn:hover { color: var(--blanco); }
         .nav-btn.activo { background-color: var(--bg-beige); color: var(--negro); }
 
@@ -53,32 +75,61 @@
         .seccion.activa { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .config-bar { background: var(--blanco); padding: 20px; border-radius: 4px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--beige-oscuro); flex-wrap: wrap; gap: 15px; }
+        /* --- SECCIÓN 1: CALCULADORA DE NOTAS --- */
+        .config-bar {
+            background: var(--blanco); padding: 20px; border-radius: 4px; margin-bottom: 25px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border: 1px solid var(--beige-oscuro);
+        }
         .lock-label { font-weight: 600; cursor: pointer; color: var(--negro); display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px;}
         .lock-label input { transform: scale(1.2); cursor: pointer; accent-color: var(--negro); }
 
-        .ramo-header-acordeon { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: var(--blanco); border-radius: 4px; cursor: pointer; margin-bottom: 5px; transition: background 0.2s; border: 1px solid var(--beige-oscuro); }
+        /* Estilos del Acordeón de Notas */
+        .ramo-header-acordeon { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 20px 25px; background: var(--blanco); border-radius: 4px; 
+            cursor: pointer; margin-bottom: 5px; transition: background 0.2s;
+            border: 1px solid var(--beige-oscuro);
+        }
         .ramo-header-acordeon:hover { background: #FCFBFA; }
-        .ramo-header-acordeon input { font-size: 1.2em; font-weight: 600; color: var(--negro); border: none; background: transparent; width: 100%; outline: none; border-bottom: 1px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
+        .ramo-header-acordeon input { 
+            font-size: 1.2em; font-weight: 600; color: var(--negro); border: none; 
+            background: transparent; width: 100%; outline: none; border-bottom: 1px solid transparent;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
         .ramo-header-acordeon input:focus:not([readonly]) { border-bottom: 1px solid var(--negro); }
-        .ramo-header-acordeon input[readonly] { border: none; cursor: pointer; color: var(--negro); pointer-events: none; }
+        .ramo-header-acordeon input[readonly] { 
+            border: none; cursor: pointer; color: var(--negro); 
+            pointer-events: none; 
+        }
         
         .titulo-wrapper { flex: 1; margin-right: 10px; min-width: 0; }
         .header-actions { display: flex; align-items: center; }
+        
         .arrow { font-size: 1.5em; color: var(--negro); user-select: none; font-weight: 300; display: inline-block; width: 20px; text-align: center; }
         .arrow::after { content: '+'; }
         .ramo-header-acordeon.abierto .arrow::after, .acordeon-header.abierto .arrow::after { content: '-'; }
         
-        .ramo-body { background: var(--blanco); border-radius: 0 0 4px 4px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--beige-oscuro); display: none; border-top: none; margin-top: -5px; }
+        .ramo-body { 
+            background: var(--blanco); border-radius: 0 0 4px 4px; padding: 25px; 
+            margin-bottom: 25px; border: 1px solid var(--beige-oscuro);
+            display: none; border-top: none; margin-top: -5px;
+        }
         .ramo-body.abierto { display: block; }
 
-        .ramo-config { display: flex; gap: 20px; margin-bottom: 25px; background: transparent; padding: 15px; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--beige-oscuro); align-items: center; flex-wrap: wrap; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* Configuración interna del ramo */
+        .ramo-config {
+            display: flex; gap: 20px; margin-bottom: 25px; background: transparent; 
+            padding: 15px; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--beige-oscuro);
+            align-items: center; flex-wrap: wrap; text-transform: uppercase; letter-spacing: 0.5px;
+        }
         .ramo-config label { display: flex; align-items: center; gap: 10px; color: var(--gris-oscuro); font-weight: 600; }
         .ramo-config input { padding: 8px; border: 1px solid var(--beige-oscuro); border-radius: 2px; width: 60px; text-align: center; }
         
         .evaluacion-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
         .evaluacion-row input { padding: 12px; border: 1px solid var(--beige-oscuro); border-radius: 2px; box-sizing: border-box; }
         
+        /* Sub-evaluaciones (Tests) */
         .sub-evaluacion-container { margin-left: 20px; padding: 20px; background: var(--bg-beige); border-left: 2px solid var(--negro); margin-bottom: 20px; }
         .sub-evaluacion-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
         .sub-evaluacion-row input { padding: 10px; border: 1px solid var(--beige-oscuro); border-radius: 2px; width: 80px; text-align: center; font-weight: 600;}
@@ -90,41 +141,62 @@
         .input-nota { flex: 1; text-align: center; font-weight: 600; border: 1px solid var(--negro) !important; background-color: var(--blanco) !important;}
         .input-porcentaje { flex: 1; text-align: center; }
         
-        button { border: none; padding: 12px 20px; border-radius: 2px; cursor: pointer; font-weight: 600; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8em; }
-        .btn-add-ramo, .btn-add-eval, .btn-add-grupo, .btn-guardar-evento { background-color: var(--negro); color: var(--blanco); border: 1px solid var(--negro); }
-        .btn-add-grupo-pond { background-color: var(--naranja-muteado); color: var(--blanco); border: 1px solid var(--naranja-muteado); }
-        .btn-add-ramo:hover, .btn-add-eval:hover, .btn-add-grupo:hover, .btn-guardar-evento:hover { background-color: var(--gris-oscuro); }
-        .btn-add-grupo-pond:hover { background-color: #8a622c; }
+        /* Botones minimalistas */
+        button { 
+            border: none; padding: 12px 20px; border-radius: 2px; cursor: pointer; 
+            font-weight: 600; transition: all 0.3s; text-transform: uppercase; 
+            letter-spacing: 1px; font-size: 0.8em; 
+        }
+        
+        .btn-add-ramo, .btn-add-eval, .btn-add-grupo, .btn-guardar-evento { 
+            background-color: var(--negro); color: var(--blanco); border: 1px solid var(--negro);
+        }
+        .btn-add-ramo:hover, .btn-add-eval:hover, .btn-add-grupo:hover, .btn-guardar-evento:hover { 
+            background-color: var(--gris-oscuro); 
+        }
+
         .btn-add-sub { background-color: var(--blanco); color: var(--negro); border: 1px solid var(--negro); }
         .btn-add-sub:hover { background-color: var(--bg-beige); }
+
         .btn-remove { background-color: transparent; color: var(--rojo-muteado); border: 1px solid var(--rojo-muteado); padding: 12px 15px; }
         .btn-remove:hover { background-color: var(--rojo-muteado); color: var(--blanco); }
+        
         .btn-remove-ramo { margin-right: 15px; }
         .btn-remove-sub { padding: 10px 12px; }
 
-        .resultados { margin-top: 30px; padding: 25px; background-color: var(--bg-beige); border: 1px solid var(--beige-oscuro); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.9em; }
+        .resultados { 
+            margin-top: 30px; padding: 25px; background-color: var(--bg-beige); 
+            border: 1px solid var(--beige-oscuro); border-radius: 4px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.9em;
+        }
         .nota-final { font-size: 2.2em; font-weight: 700; text-align: right; transition: color 0.3s; letter-spacing: 0; }
         .alerta-porcentaje { color: var(--rojo-muteado); font-size: 0.85em; margin-top: 10px; font-weight: 600; }
         .nota-necesaria { font-weight: 600; margin-top: 5px; }
 
+        /* --- SECCIÓN 2: CALENDARIO --- */
         .calendario-layout { display: grid; grid-template-columns: 1fr; gap: 25px; }
         @media (min-width: 800px) { .calendario-layout { grid-template-columns: 2.2fr 1fr; } }
+
         .cal-container { background: var(--blanco); border-radius: 4px; padding: 25px; border: 1px solid var(--beige-oscuro); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .cal-header button { background: transparent; border: 1px solid var(--negro); color: var(--negro); padding: 8px 15px; font-size: 1.2em; border-radius: 2px;}
         .cal-header button:hover { background: var(--negro); color: var(--blanco); }
         .cal-header h2 { margin: 0; }
+
         .leyenda-container { margin-bottom: 25px; padding: 15px; background: var(--bg-beige); border-radius: 4px; border: 1px solid var(--beige-oscuro);}
         .leyenda-container h4 { margin: 0 0 15px 0; font-size: 0.85em; }
         .leyenda-lista { display: flex; flex-wrap: wrap; gap: 20px; }
         .leyenda-item { display: flex; align-items: center; font-size: 0.85em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         .leyenda-color { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 2px solid var(--negro); border-left: 1px solid var(--beige-oscuro); }
         .cal-day-name { background: var(--bg-beige); color: var(--gris-oscuro); font-weight: 600; text-align: center; padding: 12px 0; border-right: 1px solid var(--beige-oscuro); border-bottom: 1px solid var(--beige-oscuro); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
         .cal-cell { min-height: 100px; border-right: 1px solid var(--beige-oscuro); border-bottom: 1px solid var(--beige-oscuro); padding: 8px; background: var(--blanco); display: flex; flex-direction: column; }
         .cal-cell.empty { background: #FAFAFA; }
         .cal-date { font-weight: 600; color: var(--gris-claro); font-size: 0.9em; margin-bottom: 5px; align-self: flex-end;}
         .cal-cell.today .cal-date { background: var(--negro); color: var(--blanco); border-radius: 2px; width: 24px; height: 24px; text-align: center; line-height: 24px; }
+        
         .contenedor-puntos { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px; }
         .evento-punto { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
         .evento-punto:hover { transform: scale(1.3); }
@@ -147,19 +219,34 @@
         .btn-borrar-evento { background: transparent; color: var(--rojo-muteado); padding: 5px 10px; font-size: 1.2em; border: none; font-weight: 300;}
         .btn-borrar-evento:hover { background: transparent; color: #000; }
 
+        /* --- ESTADO DE EVALUACIONES --- */
         .seccion-fechas-pendientes { margin-top: 50px; }
         .seccion-fechas-pendientes h2 { border-bottom: 2px solid var(--negro); padding-bottom: 15px; margin-bottom: 25px;}
-        .acordeon-header { background: var(--blanco); color: var(--negro); padding: 20px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; transition: background 0.3s; border: 1px solid var(--beige-oscuro); }
+        
+        .acordeon-header { 
+            background: var(--blanco); color: var(--negro); padding: 20px; 
+            border-radius: 4px; cursor: pointer; display: flex; 
+            justify-content: space-between; align-items: center; 
+            margin-bottom: 5px; transition: background 0.3s; border: 1px solid var(--beige-oscuro);
+        }
         .acordeon-header:hover { background: #FCFBFA; }
         .acordeon-header h3 { margin: 0; font-size: 1em; display: flex; align-items: center; gap: 12px; letter-spacing: 1px;}
         .icono-ramo { display: inline-block; width: 10px; height: 10px; background: var(--negro); border-radius: 50%; }
-        .acordeon-body { background: var(--blanco); padding: 10px 20px 20px 20px; border-radius: 0 0 4px 4px; margin-bottom: 25px; border: 1px solid var(--beige-oscuro); border-top: none; display: none; margin-top: -5px; }
+        
+        .acordeon-body { 
+            background: var(--blanco); padding: 10px 20px 20px 20px; border-radius: 0 0 4px 4px; 
+            margin-bottom: 25px; border: 1px solid var(--beige-oscuro); border-top: none; 
+            display: none; margin-top: -5px;
+        }
         .acordeon-body.abierto { display: block; }
+        
         .fila-fecha-pendiente { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-bottom: 1px solid var(--bg-beige); font-size: 0.9em; font-weight: 600; text-transform: uppercase;}
         .fila-fecha-pendiente:last-child { border-bottom: none; }
+        
         .pill-sin-fecha { background: var(--bg-beige); color: var(--naranja-muteado); padding: 8px 15px; border-radius: 2px; font-size: 0.8em; font-weight: 700; text-align: center; border: 1px solid #EAE3D5;}
         .pill-con-fecha { background: var(--bg-beige); color: var(--verde-muteado); padding: 8px 15px; border-radius: 2px; font-size: 0.8em; font-weight: 700; text-align: center; border: 1px solid #EAE3D5;}
 
+        /* --- MODAL EMERGENTE --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26,26,26,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; transition: opacity 0.3s;}
         .modal.oculto { visibility: hidden; opacity: 0; }
         .modal-contenido { background: var(--blanco); padding: 35px; border-radius: 4px; min-width: 320px; position: relative; transform: translateY(0); transition: transform 0.3s;}
@@ -170,34 +257,62 @@
         #modal-fecha { font-weight: 600; color: var(--gris-oscuro); font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
         #modal-ramo-tag { display: inline-block; padding: 6px 12px; border-radius: 2px; font-size: 0.75em; color: var(--blanco); font-weight: 700; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;}
 
+        /* ==========================================
+           ADAPTACIÓN PARA SMARTPHONES (MOVIL)
+           ========================================== */
         @media (max-width: 650px) {
             body { padding: 10px; }
             h1 { font-size: 1.5em; margin-top: 10px; }
+
             .config-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; }
-            .config-bar > div { flex-direction: column; width: 100%; }
             .btn-add-ramo { width: 100%; }
-            .ramo-header-acordeon { flex-wrap: wrap; padding: 20px 15px; }
-            .titulo-wrapper { flex: 0 0 100%; margin-bottom: 15px; margin-right: 0; }
+
+            .ramo-header-acordeon { 
+                flex-wrap: wrap; 
+                padding: 20px 15px; 
+            }
+            .titulo-wrapper { 
+                flex: 0 0 100%; 
+                margin-bottom: 15px; 
+                margin-right: 0;
+            }
             .ramo-header-acordeon input { font-size: 1.15em; }
-            .header-actions { width: 100%; justify-content: space-between; }
+            .header-actions { 
+                width: 100%; 
+                justify-content: space-between; 
+            }
             .header-actions .btn-remove-ramo { margin-right: 0 !important; }
+
             .ramo-body { padding: 20px 15px; }
+
             .ramo-config { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px;}
             .ramo-config label { width: 100%; justify-content: space-between; }
-            .evaluacion-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--beige-oscuro); padding-bottom: 20px; }
+
+            .evaluacion-row { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr auto; 
+                gap: 10px; 
+                margin-bottom: 20px; 
+                border-bottom: 1px solid var(--beige-oscuro); 
+                padding-bottom: 20px;
+            }
             .evaluacion-row .input-nombre { grid-column: 1 / -1; }
             .evaluacion-row .input-nota { width: 100%; }
             .evaluacion-row .input-porcentaje { width: 100%; }
             .evaluacion-row .btn-remove { width: 100%; padding: 12px; margin: 0; }
-            .sub-evaluacion-container { margin-left: 0; padding: 15px; border-left-width: 4px; }
+
+            .sub-evaluacion-container { margin-left: 0; padding: 15px; }
             .sub-evaluacion-row { display: flex; justify-content: space-between; gap: 10px; }
-            .sub-evaluacion-row input { flex: 1; min-width: 0; }
+            .sub-evaluacion-row input { flex: 1; }
             .sub-evaluacion-row span { width: auto; font-size: 0.8em; white-space: nowrap;}
+
             .resultados { flex-direction: column; align-items: flex-start; gap: 20px; padding: 20px; }
             .resultados > div:first-child { width: 100%; }
             .nota-final { align-self: flex-end; font-size: 2.2em; }
+            
             .botones-agregar { display: flex; flex-direction: column; width: 100%; gap: 10px;}
             .botones-agregar button { width: 100%; }
+
             .cal-container { padding: 15px; }
             .cal-header h2 { font-size: 1em; }
             .cal-day-name { font-size: 0.6em; padding: 8px 0; }
@@ -222,7 +337,7 @@
                 <input type="checkbox" id="lock-toggle" onchange="toggleBloqueo(this.checked)">
                 BLOQUEAR EDICIÓN
             </label>
-            <button class="btn-add-ramo" id="btn-add-ramo" onclick="agregarRamo()" style="display:none;">+ AGREGAR RAMO</button>
+            <button class="btn-add-ramo" id="btn-add-ramo" onclick="agregarRamo()">+ AGREGAR RAMO</button>
         </div>
         <div id="contenedor-ramos"></div>
     </div>
@@ -232,6 +347,7 @@
         <h1>Calendario de Evaluaciones</h1>
         
         <div class="calendario-layout">
+            <!-- Izquierda: Calendario Visual -->
             <div class="cal-container">
                 <div class="cal-header">
                     <button onclick="cambiarMes(-1)">&larr;</button>
@@ -247,8 +363,9 @@
                 <div class="cal-grid" id="calendario-grid"></div>
             </div>
 
+            <!-- Derecha: Formulario y Lista -->
             <div>
-                <div class="form-evento" id="form-evento" style="display: none;">
+                <div class="form-evento">
                     <h3>AÑADIR EVALUACIÓN</h3>
                     <div class="form-grupo">
                         <label>EVALUACIÓN - RAMO</label>
@@ -273,13 +390,14 @@
             </div>
         </div>
 
+        <!-- NUEVA SUB-SECCIÓN: ESTADO DE FECHAS -->
         <div class="seccion-fechas-pendientes">
             <h2>GESTIÓN DE FECHAS POR RAMO</h2>
             <div id="contenedor-fechas-pendientes"></div>
         </div>
     </div>
 
-    <!-- MODAL EMERGENTE (EVALUACIÓN) -->
+    <!-- MODAL EMERGENTE -->
     <div id="modal-evaluacion" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
@@ -290,6 +408,12 @@
     </div>
 
     <script>
+        // --- INICIALIZAR SUPABASE ---
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://wcjusgohdhziakgnrqhy.supabase.co'; 
+        const supabaseKey = 'sb_publishable_kn0SGoGHKL8jpEEfPjfIqw_UslM23iQ';
+        const supabaseApp = createClient(supabaseUrl, supabaseKey);
+
         // --- NAVEGACIÓN ---
         function cambiarSeccion(idSeccion, btn) {
             document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
@@ -310,7 +434,7 @@
         }
 
         // ==========================================
-        // LÓGICA SECCIÓN 1: NOTAS (LOCALSTORAGE + CLAVE CC)
+        // LÓGICA SECCIÓN 1: NOTAS
         // ==========================================
         const ramosDefaultNotas = [
             {
@@ -320,35 +444,73 @@
                     { id: 2, nombre: "Certamen 2", nota: "", porcentaje: "30" },
                     { id: 3, nombre: "Examen", nota: "", porcentaje: "40" }
                 ]
+            },
+            {
+                id: 2, nombre: "Estática y Dinámica", notaAprobacion: 4.0, maxRojas: 99,
+                evaluaciones: [
+                    { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" },
+                    { id: 2, nombre: "Certamen 2", nota: "", porcentaje: "30" }
+                ]
             }
         ];
 
         const eventosDefault = [
-            { id: 1, nombre: "Certamen 1 - Termodinámica", fecha: "2026-08-15", color: "#1A1A1A" }
+            { id: 1, nombre: "Certamen 1 - Ecuaciones Diferenciales", fecha: "2026-08-15", color: "#1A1A1A" },
+            { id: 2, nombre: "Laboratorio - Termodinámica", fecha: "2026-08-20", color: "#3E5A45" }
         ];
 
-        let ramosDatosLocales = localStorage.getItem('notas_uni_datos');
-        let ramos = ramosDatosLocales ? JSON.parse(ramosDatosLocales) : ramosDefaultNotas;
-        
-        let eventosDatosLocales = localStorage.getItem('calendario_eventos');
-        let eventosCalendario = eventosDatosLocales ? JSON.parse(eventosDatosLocales) : eventosDefault;
+        let ramos = [];
+        let eventosCalendario = [];
         
         let estadoLock = localStorage.getItem('notas_uni_lock');
         let modoBloqueado = estadoLock !== null ? estadoLock === 'true' : true; 
 
-        function guardarDatosNotas() { 
-            localStorage.setItem('notas_uni_datos', JSON.stringify(ramos)); 
-            renderizarFechasPendientes(); 
-        }
+        // Descarga inicial desde la Nube
+        async function cargarDatosDesdeNube() {
+            try {
+                const { data, error } = await supabaseApp
+                    .from('panel_datos')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
 
-        function guardarEventos() { 
-            localStorage.setItem('calendario_eventos', JSON.stringify(eventosCalendario)); 
+                if (data) {
+                    ramos = data.ramos || ramosDefaultNotas;
+                    eventosCalendario = data.calendario || eventosDefault;
+                } else {
+                    ramos = ramosDefaultNotas;
+                    eventosCalendario = eventosDefault;
+                }
+            } catch (e) {
+                ramos = ramosDefaultNotas;
+                eventosCalendario = eventosDefault;
+            }
+
+            renderizarNotas();
+            renderizarCalendario();
             renderizarFechasPendientes();
         }
 
+        // Subida de datos a la nube
+        async function guardarDatosNotas() { 
+            await supabaseApp.from('panel_datos').upsert({ 
+                id: 1, 
+                ramos: ramos 
+            });
+            renderizarFechasPendientes(); 
+        }
+
+        async function guardarEventos() { 
+            await supabaseApp.from('panel_datos').upsert({ 
+                id: 1, 
+                calendario: eventosCalendario 
+            });
+            renderizarFechasPendientes();
+        }
+        
         function toggleBloqueo(estado) { 
             if (!estado) {
-                let password = prompt("Contraseña de desbloqueo:");
+                let password = prompt("Contraseña:");
                 if (password !== "cc") {
                     alert("Contraseña incorrecta.");
                     document.getElementById('lock-toggle').checked = true;
@@ -367,18 +529,10 @@
         }
 
         function renderizarNotas() {
-            let ramosAbiertos = [];
-            document.querySelectorAll('.ramo-body.abierto').forEach(el => {
-                let idx = el.id.replace('cuerpo-ramo-', '');
-                ramosAbiertos.push(parseInt(idx));
-            });
-
             const cont = document.getElementById('contenedor-ramos');
             cont.innerHTML = '';
             document.getElementById('lock-toggle').checked = modoBloqueado;
             document.getElementById('btn-add-ramo').style.display = modoBloqueado ? 'none' : 'block';
-            document.getElementById('form-evento').style.display = modoBloqueado ? 'none' : 'block';
-
             const roAttr = modoBloqueado ? 'readonly' : '';
             const hideSt = modoBloqueado ? 'style="display: none;"' : '';
 
@@ -394,67 +548,18 @@
                 let htmlEvaluaciones = '';
 
                 ramo.evaluaciones.forEach((ev, j) => {
-                    
-                    // --- GRUPO PONDERADO (RA) ---
-                    if (ev.esGrupoPonderado) {
-                        if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
-
-                        let sumPonderada = 0;
-                        let sumPorcentajesValidos = 0;
-                        let totalPorcentajeSuma = 0;
-
-                        ev.subNotasPonderadas.forEach(sub => {
-                            let n = parseFloat(sub.nota);
-                            let p = parseFloat(sub.porcentaje) || 0;
-                            totalPorcentajeSuma += p;
-                            if (!isNaN(n) && n > 0 && p > 0) {
-                                sumPonderada += n * (p / 100);
-                                sumPorcentajesValidos += p;
-                            }
-                        });
-
-                        if (sumPorcentajesValidos > 0) {
-                            ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(2);
-                        } else {
-                            ev.nota = "";
-                        }
-                        
-                        let advertenciaPorcentaje = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
-
-                        htmlEvaluaciones += `
-                            <div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;">
-                                <div class="evaluacion-row">
-                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}>
-                                    <input type="number" class="input-nota" value="${ev.nota}" placeholder="PROMEDIO" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio ponderado calculado automáticamente">
-                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr} title="Porcentaje que vale todo este grupo en el ramo">
-                                    <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
-                                </div>
-                                <div class="sub-evaluacion-container" style="border-left-color: var(--naranja-muteado); margin-bottom: 0;">
-                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas con porcentaje propio ${advertenciaPorcentaje}</div>
-                                    ${ev.subNotasPonderadas.map((sub, k) => `
-                                        <div class="sub-evaluacion-row">
-                                            <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
-                                            <input type="number" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="Nota" step="0.1" min="1" max="7">
-                                            <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
-                                            <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
-                                        </div>
-                                    `).join('')}
-                                    <button class="btn-add-sub" onclick="addEvSubPond(${i},${j})" ${hideSt}>+ AÑADIR NOTA PONDERADA</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    // --- GRUPO SIMPLE (PROMEDIO DIRECTO) ---
-                    else if (ev.esGrupo) {
+                    if (ev.esGrupo) {
                         if (!ev.subNotas) ev.subNotas = [""]; 
+                        
                         let validSubNotas = ev.subNotas.map(n => parseFloat(n)).filter(n => !isNaN(n) && n >= 1 && n <= 7);
                         let sumSub = validSubNotas.reduce((a, b) => a + b, 0);
+                        
                         ev.nota = validSubNotas.length > 0 ? (sumSub / validSubNotas.length).toFixed(1) : "";
                         
                         htmlEvaluaciones += `
                             <div style="margin-bottom: 25px;">
                                 <div class="evaluacion-row">
-                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: TESTS)" ${roAttr}>
+                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: CONTROLES)" ${roAttr}>
                                     <input type="number" class="input-nota" value="${ev.nota}" placeholder="PROMEDIO" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);" title="Promedio calculado automáticamente">
                                     <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                     <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
@@ -472,9 +577,7 @@
                                 </div>
                             </div>
                         `;
-                    } 
-                    // --- EVALUACIÓN NORMAL ---
-                    else {
+                    } else {
                         htmlEvaluaciones += `
                             <div class="evaluacion-row">
                                 <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}>
@@ -487,7 +590,11 @@
 
                     let n = parseFloat(ev.nota);
                     let p = parseFloat(ev.porcentaje) || 0;
-                    if ((ev.nombre.trim() !== "" || p > 0) && (ev.nota === "" || isNaN(n))) { faltanNotas = true; }
+                    
+                    if ((ev.nombre.trim() !== "" || p > 0) && (ev.nota === "" || isNaN(n))) {
+                        faltanNotas = true;
+                    }
+
                     if (!isNaN(n) && n > 0 && p > 0) {
                         sumaN += (n * (p / 100));
                         if (n < 4.0) notasRojasCount++;
@@ -501,21 +608,32 @@
                 if (notasRojasCount > limiteRojas) {
                     msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`;
                     colorNotaFinal = "var(--rojo-muteado)"; 
-                } else if (sumaP < 100 && sumaP > 0) {
+                } 
+                else if (sumaP < 100 && sumaP > 0) {
                     let falta = 100 - sumaP;
                     let nec = (notaReq - sumaN) / (falta/100);
-                    if(nec <= 1.0) { msg = `<div class="nota-necesaria">APROBADO.</div>`; } 
-                    else if(nec > 7.0) { msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS UN ${nec.toFixed(1)} - REPROBADO.</div>`; colorNotaFinal = "var(--rojo-muteado)"; } 
-                    else { msg = `<div class="nota-necesaria">NECESITAS UN ${nec.toFixed(1)} EN EL ${falta}% RESTANTE PARA EL ${notaReq.toFixed(1)}.</div>`; let promParcial = sumaN / (sumaP / 100); if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)"; }
+                    
+                    if(nec <= 1.0) {
+                        msg = `<div class="nota-necesaria">APROBADO.</div>`;
+                    } else if(nec > 7.0) {
+                        msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS UN ${nec.toFixed(1)} - REPROBADO.</div>`;
+                        colorNotaFinal = "var(--rojo-muteado)";
+                    } else {
+                        msg = `<div class="nota-necesaria">NECESITAS UN ${nec.toFixed(1)} EN EL ${falta}% RESTANTE PARA EL ${notaReq.toFixed(1)}.</div>`;
+                        let promParcial = sumaN / (sumaP / 100);
+                        if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)";
+                    }
                 } else if (sumaP === 100) {
-                    if (sumaN < notaReq) { msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO (MÍNIMO: ${notaReq.toFixed(1)})</div>`; colorNotaFinal = "var(--rojo-muteado)"; } 
-                    else { msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`; }
+                    if (sumaN < notaReq) {
+                        msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO (MÍNIMO: ${notaReq.toFixed(1)})</div>`;
+                        colorNotaFinal = "var(--rojo-muteado)";
+                    } else {
+                        msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`;
+                    }
                 }
 
                 let err = sumaP > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP}%.</div>` : '';
-                
-                let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
-                
+                let claseAbierto = i === 0 ? 'abierto' : '';
                 let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
 
                 cont.innerHTML += `
@@ -549,8 +667,7 @@
                             
                             <div class="botones-agregar" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
                                 <button class="btn-add-eval" onclick="addEv(${i})" ${hideSt}>+ AGREGAR EVALUACIÓN</button>
-                                <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ GRUPO SIMPLE (PROMEDIO)</button>
-                                <button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO PONDERADO (EJ: RA)</button>
+                                <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ AGREGAR GRUPO DE TESTS</button>
                             </div>
 
                             <div class="resultados">
@@ -569,62 +686,63 @@
         function agregarRamo() { 
             let notaApp = prompt("¿Con qué nota se aprueba este ramo? (Ej: 4.0, 4.5)", "4.0");
             if (notaApp === null) return; 
+            
             let rojas = prompt("¿Cuántas notas rojas (< 4.0) MÁXIMO puedes tener antes de reprobar automáticamente?\n(Deja vacío o pon 99 si no hay límite)", "99");
             if (rojas === null) return; 
+
             let maxR = parseInt(rojas);
             if (isNaN(maxR) || rojas.trim() === "") maxR = 99;
 
-            ramos.push({ nombre: "", notaAprobacion: parseFloat(notaApp) || 4.0, maxRojas: maxR, evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] }); 
+            ramos.push({ 
+                nombre: "", 
+                notaAprobacion: parseFloat(notaApp) || 4.0,
+                maxRojas: maxR,
+                evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] 
+            }); 
             renderizarNotas(); 
         }
 
         function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); } }
         function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); }
         
-        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); }
-        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); }
-        
-        function addEvGrupoPonderado(i) { 
-            ramos[i].evaluaciones.push({ 
-                nombre: "RA 1", nota: "", porcentaje: "", 
-                esGrupo: false, esGrupoPonderado: true, 
-                subNotasPonderadas: [{ nota: "", porcentaje: "60" }, { nota: "", porcentaje: "40" }] 
-            }); 
-            renderizarNotas(); 
-        }
+        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false }); renderizarNotas(); }
+        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, subNotas: [""] }); renderizarNotas(); }
         
         function delEv(i, j) { ramos[i].evaluaciones.splice(j, 1); renderizarNotas(); }
         
         function actEv(i, j, c, v) { 
             if (c === 'nota' && v !== "") {
                 let num = parseFloat(v);
-                if (num < 1 || num > 7) { alert("Nota no válida."); v = ""; }
+                if (num < 1 || num > 7) {
+                    alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
+                    v = ""; 
+                }
             }
             ramos[i].evaluaciones[j][c] = v; 
             renderizarNotas(); 
         }
 
-        function addEvSub(i, j) { ramos[i].evaluaciones[j].subNotas.push(""); renderizarNotas(); }
-        function delEvSub(i, j, k) { ramos[i].evaluaciones[j].subNotas.splice(k, 1); renderizarNotas(); }
+        function addEvSub(i, j) {
+            ramos[i].evaluaciones[j].subNotas.push("");
+            renderizarNotas();
+        }
+
+        function delEvSub(i, j, k) {
+            ramos[i].evaluaciones[j].subNotas.splice(k, 1);
+            renderizarNotas();
+        }
+
         function actEvSub(i, j, k, v) {
             if (v !== "") {
                 let num = parseFloat(v);
-                if (num < 1 || num > 7) { alert("Nota no válida."); v = ""; }
+                if (num < 1 || num > 7) {
+                    alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
+                    v = ""; 
+                }
             }
             ramos[i].evaluaciones[j].subNotas[k] = v;
             renderizarNotas();
         }
-
-        function actEvSubPond(i, j, k, campo, v) {
-            if (campo === 'nota' && v !== "") {
-                let num = parseFloat(v);
-                if (num < 1 || num > 7) { alert("Nota no válida."); v = ""; }
-            }
-            ramos[i].evaluaciones[j].subNotasPonderadas[k][campo] = v;
-            renderizarNotas();
-        }
-        function addEvSubPond(i, j) { ramos[i].evaluaciones[j].subNotasPonderadas.push({nota: "", porcentaje: ""}); renderizarNotas(); }
-        function delEvSubPond(i, j, k) { ramos[i].evaluaciones[j].subNotasPonderadas.splice(k, 1); renderizarNotas(); }
 
 
         // ==========================================
@@ -633,6 +751,7 @@
         let fechaActual = new Date(); 
         let mesActual = fechaActual.getMonth(); 
         let anioActual = fechaActual.getFullYear();
+
         const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
         const diasSemana = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
 
@@ -654,6 +773,7 @@
             grid.innerHTML = '';
             
             diasSemana.forEach(dia => { grid.innerHTML += `<div class="cal-day-name">${dia}</div>`; });
+
             const primerDiaMes = new Date(anioActual, mesActual, 1).getDay();
             const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
 
@@ -664,12 +784,22 @@
                 let fechaFormateada = `${anioActual}-${String(mesActual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
                 let eventosDelDia = eventosCalendario.filter(ev => ev.fecha === fechaFormateada);
                 
-                let htmlPuntos = eventosDelDia.map(ev => `<div class="evento-punto" style="background-color: ${ev.color};" onclick="abrirModal('${ev.nombre}', '${ev.fecha}', '${ev.color}')" title="${ev.nombre}"></div>`).join('');
+                let htmlPuntos = eventosDelDia.map(ev => 
+                    `<div class="evento-punto" style="background-color: ${ev.color};" 
+                          onclick="abrirModal('${ev.nombre}', '${ev.fecha}', '${ev.color}')" 
+                          title="${ev.nombre}"></div>`
+                ).join('');
+
                 let contenedorPuntos = eventosDelDia.length > 0 ? `<div class="contenedor-puntos">${htmlPuntos}</div>` : '';
                 let esHoy = (dia === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear()) ? 'today' : '';
 
-                grid.innerHTML += `<div class="cal-cell ${esHoy}"><span class="cal-date">${dia}</span>${contenedorPuntos}</div>`;
+                grid.innerHTML += `
+                    <div class="cal-cell ${esHoy}">
+                        <span class="cal-date">${dia}</span>
+                        ${contenedorPuntos}
+                    </div>`;
             }
+            
             actualizarLeyenda();
             renderizarListaEventos();
         }
@@ -678,14 +808,23 @@
             const contLeyenda = document.getElementById('leyenda-ramos');
             contLeyenda.innerHTML = '';
             let ramosUnicos = {};
-            eventosCalendario.forEach(ev => { let ramo = obtenerNombreRamo(ev.nombre); ramosUnicos[ramo] = ev.color; });
+
+            eventosCalendario.forEach(ev => {
+                let ramo = obtenerNombreRamo(ev.nombre);
+                ramosUnicos[ramo] = ev.color;
+            });
 
             if(Object.keys(ramosUnicos).length === 0) {
                 contLeyenda.innerHTML = '<span style="color:var(--gris-claro); font-size: 0.85em;">NO HAY RAMOS CON FECHAS ASIGNADAS.</span>';
                 return;
             }
+
             for (const [ramo, color] of Object.entries(ramosUnicos)) {
-                contLeyenda.innerHTML += `<div class="leyenda-item"><div class="leyenda-color" style="background-color: ${color};"></div><span>${ramo}</span></div>`;
+                contLeyenda.innerHTML += `
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: ${color};"></div>
+                        <span>${ramo}</span>
+                    </div>`;
             }
         }
 
@@ -698,10 +837,17 @@
                 cont.innerHTML = '<p style="color:var(--gris-claro); font-size:0.85em; text-align:center; text-transform: uppercase;">No hay evaluaciones registradas.</p>';
                 return;
             }
+
             ordenados.forEach(ev => {
                 const [anio, mes, dia] = ev.fecha.split('-');
-                let hideSt = modoBloqueado ? 'style="display: none;"' : '';
-                cont.innerHTML += `<div class="evento-item" style="border-left-color: ${ev.color}"><div class="evento-info"><span class="evento-titulo">${ev.nombre}</span><span class="evento-fecha">${dia}/${mes}/${anio}</span></div><button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})" title="Borrar" ${hideSt}>&times;</button></div>`;
+                cont.innerHTML += `
+                    <div class="evento-item" style="border-left-color: ${ev.color}">
+                        <div class="evento-info">
+                            <span class="evento-titulo">${ev.nombre}</span>
+                            <span class="evento-fecha">${dia}/${mes}/${anio}</span>
+                        </div>
+                        <button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})" title="Borrar">&times;</button>
+                    </div>`;
             });
         }
 
@@ -718,11 +864,14 @@
             const partes = nombre.split('-');
             const tituloEv = partes[0].trim();
             const nombreRamo = partes.length > 1 ? partes[1].trim() : 'General';
+
             let ramoIndex = ramos.findIndex(r => r.nombre.toLowerCase() === nombreRamo.toLowerCase());
             
             if (ramoIndex !== -1) {
                 let evExiste = ramos[ramoIndex].evaluaciones.some(e => e.nombre.toLowerCase() === tituloEv.toLowerCase());
-                if (!evExiste) { ramos[ramoIndex].evaluaciones.push({ nombre: tituloEv, nota: "", porcentaje: "" }); }
+                if (!evExiste) {
+                    ramos[ramoIndex].evaluaciones.push({ nombre: tituloEv, nota: "", porcentaje: "" });
+                }
             } else {
                 ramos.push({ nombre: nombreRamo, notaAprobacion: 4.0, maxRojas: 99, evaluaciones: [{ nombre: tituloEv, nota: "", porcentaje: "" }] });
             }
@@ -739,50 +888,85 @@
             renderizarCalendario();
         }
 
+        // --- LÓGICA DE GESTIÓN DE FECHAS PENDIENTES ---
         function renderizarFechasPendientes() {
             const cont = document.getElementById('contenedor-fechas-pendientes');
             cont.innerHTML = '';
+
             ramos.forEach((ramo, i) => {
                 if (!ramo.nombre) return; 
+
                 let htmlEvaluaciones = '';
+                
                 ramo.evaluaciones.forEach(ev => {
                     if (!ev.nombre) return; 
+                    
                     const busquedaExacta = `${ev.nombre.trim()} - ${ramo.nombre.trim()}`.toLowerCase();
-                    const eventoEncontrado = eventosCalendario.find(e => e.nombre.toLowerCase() === busquedaExacta || (e.nombre.toLowerCase().includes(ev.nombre.toLowerCase()) && e.nombre.toLowerCase().includes(ramo.nombre.toLowerCase())));
+                    
+                    const eventoEncontrado = eventosCalendario.find(e => 
+                        e.nombre.toLowerCase() === busquedaExacta || 
+                        (e.nombre.toLowerCase().includes(ev.nombre.toLowerCase()) && e.nombre.toLowerCase().includes(ramo.nombre.toLowerCase()))
+                    );
+
                     let pillHTML = `<span class="pill-sin-fecha">SIN FECHA ASIGNADA</span>`;
                     if (eventoEncontrado) {
                         const [anio, mes, dia] = eventoEncontrado.fecha.split('-');
                         pillHTML = `<span class="pill-con-fecha">${dia}/${mes}/${anio}</span>`;
                     }
-                    htmlEvaluaciones += `<div class="fila-fecha-pendiente"><span>${ev.nombre}</span>${pillHTML}</div>`;
+
+                    htmlEvaluaciones += `
+                        <div class="fila-fecha-pendiente">
+                            <span>${ev.nombre}</span>
+                            ${pillHTML}
+                        </div>
+                    `;
                 });
-                if (htmlEvaluaciones === '') { htmlEvaluaciones = '<div style="padding:15px; color:var(--gris-claro); font-size: 0.85em; text-transform: uppercase;">No hay evaluaciones registradas para este ramo.</div>'; }
+
+                if (htmlEvaluaciones === '') {
+                    htmlEvaluaciones = '<div style="padding:15px; color:var(--gris-claro); font-size: 0.85em; text-transform: uppercase;">No hay evaluaciones registradas para este ramo.</div>';
+                }
+
                 let claseAbierto = i === 0 ? 'abierto' : '';
-                cont.innerHTML += `<div><div class="acordeon-header ${claseAbierto}" onclick="toggleAcordeon(this, 'fechas-ramo-${i}')"><h3><span class="icono-ramo"></span> ${ramo.nombre}</h3><span class="arrow"></span></div><div id="fechas-ramo-${i}" class="acordeon-body ${claseAbierto}">${htmlEvaluaciones}</div></div>`;
+
+                cont.innerHTML += `
+                    <div>
+                        <div class="acordeon-header ${claseAbierto}" onclick="toggleAcordeon(this, 'fechas-ramo-${i}')">
+                            <h3><span class="icono-ramo"></span> ${ramo.nombre}</h3>
+                            <span class="arrow"></span>
+                        </div>
+                        <div id="fechas-ramo-${i}" class="acordeon-body ${claseAbierto}">
+                            ${htmlEvaluaciones}
+                        </div>
+                    </div>
+                `;
             });
         }
 
+        // Lógica del Modal
         function abrirModal(nombreCompleto, fecha, color) {
             const [anio, mes, dia] = fecha.split('-');
             const partes = nombreCompleto.split('-');
+            
             const titulo = partes[0].trim();
             const ramo = partes.length > 1 ? partes[1].trim() : 'Evaluación';
 
             document.getElementById('modal-titulo').innerText = titulo;
             document.getElementById('modal-titulo').style.color = color;
             document.getElementById('modal-fecha').innerText = `${dia}/${mes}/${anio}`;
+            
             const tagRamo = document.getElementById('modal-ramo-tag');
             tagRamo.innerText = ramo;
             tagRamo.style.backgroundColor = color;
+
             document.getElementById('modal-evaluacion').classList.remove('oculto');
         }
 
-        function cerrarModal() { document.getElementById('modal-evaluacion').classList.add('oculto'); }
+        function cerrarModal() {
+            document.getElementById('modal-evaluacion').classList.add('oculto');
+        }
 
-        // --- INICIO DE APLICACIÓN ---
-        renderizarNotas();
-        renderizarCalendario();
-        renderizarFechasPendientes();
+        // --- INICIO DE APLICACIÓN CON SUPABASE ---
+        cargarDatosDesdeNube();
 
     </script>
 </body>
