@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Panel Universitario</title>
     
+    <!-- Configuración para iPhone (Safari) / PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Panel U">
+    <!-- Icono dinámico elegante (Fondo negro, Letra Beige) -->
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
+    <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
+
     <!-- Fuente Inter de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +40,7 @@
             margin: 0 auto; 
             padding: 20px; 
             font-weight: 400;
+            -webkit-tap-highlight-color: transparent; /* Quita el destello azul al tocar en iOS */
         }
         
         h1, h2, h3, h4 {
@@ -92,6 +101,7 @@
         }
         
         .titulo-wrapper { flex: 1; margin-right: 10px; min-width: 0; }
+        .header-actions { display: flex; align-items: center; }
         
         .arrow { font-size: 1.5em; color: var(--negro); user-select: none; font-weight: 300; display: inline-block; width: 20px; text-align: center; }
         .arrow::after { content: '+'; }
@@ -252,8 +262,23 @@
             .config-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; }
             .btn-add-ramo { width: 100%; }
 
-            .ramo-header-acordeon { padding: 15px; }
-            .ramo-header-acordeon input { font-size: 1.1em; }
+            /* ARREGLO DE ENCABEZADO SUPERPUESTO */
+            .ramo-header-acordeon { 
+                flex-wrap: wrap; 
+                padding: 20px 15px; 
+            }
+            .titulo-wrapper { 
+                flex: 0 0 100%; 
+                margin-bottom: 15px; 
+                margin-right: 0;
+            }
+            .ramo-header-acordeon input { font-size: 1.15em; }
+            .header-actions { 
+                width: 100%; 
+                justify-content: space-between; 
+            }
+            .header-actions .btn-remove { margin-right: 0 !important; }
+
             .ramo-body { padding: 20px 15px; }
 
             .ramo-config { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px;}
@@ -570,8 +595,8 @@
                             <div class="titulo-wrapper" onclick="if(!modoBloqueado) event.stopPropagation()">
                                 <input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}>
                             </div>
-                            <div style="display:flex; align-items:center;">
-                                <button class="btn-remove" style="margin-right: 15px; padding: 10px 15px;" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
+                            <div class="header-actions">
+                                <button class="btn-remove" style="margin-right: 15px;" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
                                 <div style="padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                     <span class="arrow"></span>
                                 </div>
