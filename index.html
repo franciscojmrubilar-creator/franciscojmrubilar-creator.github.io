@@ -151,9 +151,13 @@
         .btn-add-ramo, .btn-add-eval, .btn-add-grupo, .btn-guardar-evento { 
             background-color: var(--negro); color: var(--blanco); border: 1px solid var(--negro);
         }
+        .btn-add-grupo-pond { 
+            background-color: var(--naranja-muteado); color: var(--blanco); border: 1px solid var(--naranja-muteado); 
+        }
         .btn-add-ramo:hover, .btn-add-eval:hover, .btn-add-grupo:hover, .btn-guardar-evento:hover { 
             background-color: var(--gris-oscuro); 
         }
+        .btn-add-grupo-pond:hover { background-color: #8a622c; }
 
         .btn-add-sub { background-color: var(--blanco); color: var(--negro); border: 1px solid var(--negro); }
         .btn-add-sub:hover { background-color: var(--bg-beige); }
@@ -529,10 +533,18 @@
         }
 
         function renderizarNotas() {
+            // Guardar estado de los ramos abiertos
+            let ramosAbiertos = [];
+            document.querySelectorAll('.ramo-body.abierto').forEach(el => {
+                let idx = el.id.replace('cuerpo-ramo-', '');
+                ramosAbiertos.push(parseInt(idx));
+            });
+
             const cont = document.getElementById('contenedor-ramos');
             cont.innerHTML = '';
             document.getElementById('lock-toggle').checked = modoBloqueado;
             document.getElementById('btn-add-ramo').style.display = modoBloqueado ? 'none' : 'block';
+            
             const roAttr = modoBloqueado ? 'readonly' : '';
             const hideSt = modoBloqueado ? 'style="display: none;"' : '';
 
@@ -548,7 +560,58 @@
                 let htmlEvaluaciones = '';
 
                 ramo.evaluaciones.forEach((ev, j) => {
-                    if (ev.esGrupo) {
+                    // --- GRUPO PONDERADO (EJ: RA) ---
+                    if (ev.esGrupoPonderado) {
+                        if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
+
+                        let sumPonderada = 0;
+                        let sumPorcentajesValidos = 0;
+                        let totalPorcentajeSuma = 0;
+
+                        ev.subNotasPonderadas.forEach(sub => {
+                            let n = parseFloat(sub.nota);
+                            let p = parseFloat(sub.porcentaje) || 0;
+                            totalPorcentajeSuma += p;
+                            if (!isNaN(n) && n > 0 && p > 0) {
+                                sumPonderada += n * (p / 100);
+                                sumPorcentajesValidos += p;
+                            }
+                        });
+
+                        if (sumPorcentajesValidos > 0) {
+                            ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(2);
+                        } else {
+                            ev.nota = "";
+                        }
+                        
+                        let advertenciaPorcentaje = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
+
+                        htmlEvaluaciones += `
+                            <div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;">
+                                <div class="evaluacion-row">
+                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}>
+                                    <input type="number" class="input-nota" value="${ev.nota}" placeholder="PROMEDIO" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio ponderado calculado automáticamente">
+                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr} title="Porcentaje que vale todo este grupo en el ramo">
+                                    <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
+                                </div>
+                                <div class="sub-evaluacion-container" style="border-left-color: var(--naranja-muteado); margin-bottom: 0;">
+                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas con porcentaje propio ${advertenciaPorcentaje}</div>
+                                    ${ev.subNotasPonderadas.map((sub, k) => `
+                                        <div class="sub-evaluacion-row">
+                                            <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
+                                            <!-- Nota no usa roAttr para permitir edición bloqueado -->
+                                            <input type="number" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="Nota" step="0.1" min="1" max="7">
+                                            <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
+                                            <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
+                                        </div>
+                                    `).join('')}
+                                    <button class="btn-add-sub" onclick="addEvSubPond(${i},${j})" ${hideSt}>+ AÑADIR NOTA PONDERADA</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    // --- GRUPO SIMPLE ---
+                    else if (ev.esGrupo) {
                         if (!ev.subNotas) ev.subNotas = [""]; 
                         
                         let validSubNotas = ev.subNotas.map(n => parseFloat(n)).filter(n => !isNaN(n) && n >= 1 && n <= 7);
@@ -569,6 +632,7 @@
                                     ${ev.subNotas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); text-transform: uppercase; font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
+                                            <!-- Nota no usa roAttr -->
                                             <input type="number" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="Nota" step="0.1" min="1" max="7">
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button>
                                         </div>
@@ -577,10 +641,13 @@
                                 </div>
                             </div>
                         `;
-                    } else {
+                    } 
+                    // --- EVALUACIÓN NORMAL ---
+                    else {
                         htmlEvaluaciones += `
                             <div class="evaluacion-row">
                                 <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}>
+                                <!-- Nota no usa roAttr -->
                                 <input type="number" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="NOTA" step="0.1" min="1" max="7">
                                 <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                 <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
@@ -633,7 +700,10 @@
                 }
 
                 let err = sumaP > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP}%.</div>` : '';
-                let claseAbierto = i === 0 ? 'abierto' : '';
+                
+                // Aplicar estado abierto solo si estaba abierto antes
+                let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
+                
                 let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
 
                 cont.innerHTML += `
@@ -668,6 +738,7 @@
                             <div class="botones-agregar" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
                                 <button class="btn-add-eval" onclick="addEv(${i})" ${hideSt}>+ AGREGAR EVALUACIÓN</button>
                                 <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ AGREGAR GRUPO DE TESTS</button>
+                                <button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO PONDERADO (EJ: RA)</button>
                             </div>
 
                             <div class="resultados">
@@ -705,9 +776,18 @@
         function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); } }
         function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); }
         
-        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false }); renderizarNotas(); }
-        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, subNotas: [""] }); renderizarNotas(); }
+        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); }
+        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); }
         
+        function addEvGrupoPonderado(i) { 
+            ramos[i].evaluaciones.push({ 
+                nombre: "RA 1", nota: "", porcentaje: "", 
+                esGrupo: false, esGrupoPonderado: true, 
+                subNotasPonderadas: [{ nota: "", porcentaje: "60" }, { nota: "", porcentaje: "40" }] 
+            }); 
+            renderizarNotas(); 
+        }
+
         function delEv(i, j) { ramos[i].evaluaciones.splice(j, 1); renderizarNotas(); }
         
         function actEv(i, j, c, v) { 
@@ -744,6 +824,24 @@
             renderizarNotas();
         }
 
+        function actEvSubPond(i, j, k, campo, v) {
+            if (campo === 'nota' && v !== "") {
+                let num = parseFloat(v);
+                if (num < 1 || num > 7) { alert("Nota no válida."); v = ""; }
+            }
+            ramos[i].evaluaciones[j].subNotasPonderadas[k][campo] = v;
+            renderizarNotas();
+        }
+
+        function addEvSubPond(i, j) { 
+            ramos[i].evaluaciones[j].subNotasPonderadas.push({nota: "", porcentaje: ""}); 
+            renderizarNotas(); 
+        }
+
+        function delEvSubPond(i, j, k) { 
+            ramos[i].evaluaciones[j].subNotasPonderadas.splice(k, 1); 
+            renderizarNotas(); 
+        }
 
         // ==========================================
         // LÓGICA SECCIÓN 2: CALENDARIO Y FECHAS
@@ -926,7 +1024,8 @@
                     htmlEvaluaciones = '<div style="padding:15px; color:var(--gris-claro); font-size: 0.85em; text-transform: uppercase;">No hay evaluaciones registradas para este ramo.</div>';
                 }
 
-                let claseAbierto = i === 0 ? 'abierto' : '';
+                // Iniciar siempre cerrados
+                let claseAbierto = '';
 
                 cont.innerHTML += `
                     <div>
