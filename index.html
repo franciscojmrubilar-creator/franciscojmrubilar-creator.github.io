@@ -346,7 +346,6 @@
             renderizarFechasPendientes();
         }
 
-        // --- SISTEMA DE CONTRASEÑA "CC" (RECUPERADO) ---
         function toggleBloqueo(estado) { 
             if (!estado) {
                 let password = prompt("Contraseña de desbloqueo:");
@@ -368,7 +367,6 @@
         }
 
         function renderizarNotas() {
-            // MEJORA 1 y 2: Guardamos qué acordeones están abiertos antes de redibujar la pantalla.
             let ramosAbiertos = [];
             document.querySelectorAll('.ramo-body.abierto').forEach(el => {
                 let idx = el.id.replace('cuerpo-ramo-', '');
@@ -397,7 +395,7 @@
 
                 ramo.evaluaciones.forEach((ev, j) => {
                     
-                    // --- GRUPO PONDERADO (NUEVO) ---
+                    // --- GRUPO PONDERADO (RA) ---
                     if (ev.esGrupoPonderado) {
                         if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
 
@@ -415,7 +413,6 @@
                             }
                         });
 
-                        // MEJORA 3: Calcula el promedio real sobre la marcha si falta dar pruebas de ese grupo
                         if (sumPorcentajesValidos > 0) {
                             ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(2);
                         } else {
@@ -437,7 +434,7 @@
                                     ${ev.subNotasPonderadas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
-                                            <input type="number" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="Nota" step="0.1" min="1" max="7" ${roAttr}>
+                                            <input type="number" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="Nota" step="0.1" min="1" max="7">
                                             <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
                                         </div>
@@ -467,7 +464,7 @@
                                     ${ev.subNotas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); text-transform: uppercase; font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
-                                            <input type="number" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="Nota" step="0.1" min="1" max="7" ${roAttr}>
+                                            <input type="number" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="Nota" step="0.1" min="1" max="7">
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button>
                                         </div>
                                     `).join('')}
@@ -481,7 +478,7 @@
                         htmlEvaluaciones += `
                             <div class="evaluacion-row">
                                 <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}>
-                                <input type="number" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="NOTA" step="0.1" min="1" max="7" ${roAttr}>
+                                <input type="number" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="NOTA" step="0.1" min="1" max="7">
                                 <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                 <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                             </div>
@@ -517,7 +514,6 @@
 
                 let err = sumaP > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP}%.</div>` : '';
                 
-                // MEJORA 1 y 2: Aplica la clase 'abierto' solo si el ramo estaba en la lista de memorizados
                 let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
                 
                 let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
@@ -588,7 +584,6 @@
         function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); }
         function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); }
         
-        // --- FUNCIÓN AGREGAR GRUPO PONDERADO (NUEVO) ---
         function addEvGrupoPonderado(i) { 
             ramos[i].evaluaciones.push({ 
                 nombre: "RA 1", nota: "", porcentaje: "", 
@@ -620,7 +615,6 @@
             renderizarNotas();
         }
 
-        // --- FUNCIONES PARA SUB-NOTAS PONDERADAS ---
         function actEvSubPond(i, j, k, campo, v) {
             if (campo === 'nota' && v !== "") {
                 let num = parseFloat(v);
