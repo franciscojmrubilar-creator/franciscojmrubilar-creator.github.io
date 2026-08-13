@@ -228,7 +228,7 @@
         
         .pred-inputs-mma { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        .btn-pred-submit { width: 100%; background: var(--verde-muteado); margin-top: 20px; border-color: var(--verde-muteado);}
+        .btn-pred-submit { width: 100%; background: var(--verde-muteado); margin-top: 20px; border-color: var(--verde-muteado); color: var(--blanco); }
         .btn-pred-submit:hover { background: #2f4535; }
         
         .pred-msg-cerrado { text-align: center; padding: 20px; background: var(--bg-beige); border-radius: 2px; color: var(--gris-oscuro); font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
@@ -400,7 +400,7 @@
 
     </div>
 
-    <!-- MODAL EMERGENTE CALENDARIO -->
+    <!-- MODALES VARIOS... -->
     <div id="modal-evaluacion" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
@@ -410,7 +410,6 @@
         </div>
     </div>
 
-    <!-- MODAL CARGAR RESULTADO PREDICCIONES -->
     <div id="modal-resultado-pred" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalPred()">&times;</span>
@@ -424,15 +423,12 @@
                 <input type="hidden" id="modal-res-ganador">
             </div>
 
-            <div id="modal-res-exacto-container">
-                <!-- Se inyecta dinamicamente text o select MMA -->
-            </div>
+            <div id="modal-res-exacto-container"></div>
 
             <button class="btn-guardar-evento" style="margin-top: 25px; width: 100%;" onclick="guardarResultadoReal()">GUARDAR Y FINALIZAR EVENTO</button>
         </div>
     </div>
 
-    <!-- MODAL CREAR EVENTO PREDICCIÓN -->
     <div id="modal-crear-evento" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalCrearEvento()">&times;</span>
@@ -467,10 +463,7 @@
                     <label>Cerrar predicciones (Horas antes)</label>
                     <input type="number" id="pred-nuevo-horas" value="1" min="0" step="0.5">
                 </div>
-                <!-- Eliminado el campo Lugar -->
-                <!-- Eliminado el campo Imagen Fondo -->
             </div>
-            
             <button class="btn-guardar-evento" style="margin-top: 25px; width: 100%;" onclick="crearEventoPrediccion()">AGREGAR EVENTO DEPORTIVO</button>
         </div>
     </div>
@@ -504,25 +497,16 @@
         // ==========================================
         // LÓGICA SECCIÓN 1 Y 2: NOTAS Y CALENDARIO
         // ==========================================
-        const ramosDefaultNotas = [
-            {
-                id: 1, nombre: "Termodinámica", notaAprobacion: 4.0, maxRojas: 99,
-                evaluaciones: [ { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" } ]
-            }
-        ];
+        const ramosDefaultNotas = [ { id: 1, nombre: "Termodinámica", notaAprobacion: 4.0, maxRojas: 99, evaluaciones: [ { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" } ] } ];
         const eventosDefault = [];
 
         let ramos = [];
         let eventosCalendario = [];
         let eventosPredicciones = []; 
-        
         let estadoLock = localStorage.getItem('notas_uni_lock');
         let modoBloqueado = estadoLock !== null ? estadoLock === 'true' : true; 
-        
-        // Anti-trampa predicciones
         let nombreUsuarioPred = localStorage.getItem('pred_username') || '';
 
-        // Descarga inicial
         async function cargarDatosDesdeNube() {
             try {
                 const { data, error } = await supabaseApp.from('panel_datos').select('*').eq('id', 1).single();
@@ -531,93 +515,49 @@
                     eventosCalendario = data.calendario || eventosDefault;
                     eventosPredicciones = data.predicciones || [];
                 } else {
-                    ramos = ramosDefaultNotas;
-                    eventosCalendario = eventosDefault;
+                    ramos = ramosDefaultNotas; eventosCalendario = eventosDefault;
                 }
-            } catch (e) {
-                ramos = ramosDefaultNotas;
-                eventosCalendario = eventosDefault;
-            }
-            renderizarNotas();
-            renderizarCalendario();
-            renderizarFechasPendientes();
-            renderizarPredicciones();
+            } catch (e) { ramos = ramosDefaultNotas; eventosCalendario = eventosDefault; }
+            renderizarNotas(); renderizarCalendario(); renderizarFechasPendientes(); renderizarPredicciones();
         }
 
         async function guardarDatosGlobal() { 
-            await supabaseApp.from('panel_datos').upsert({ 
-                id: 1, 
-                ramos: ramos,
-                calendario: eventosCalendario,
-                predicciones: eventosPredicciones
-            });
-            renderizarFechasPendientes(); 
-            renderizarPredicciones();
+            await supabaseApp.from('panel_datos').upsert({ id: 1, ramos: ramos, calendario: eventosCalendario, predicciones: eventosPredicciones });
+            renderizarFechasPendientes(); renderizarPredicciones();
         }
 
         function toggleBloqueo(estado) { 
-            if (!estado) {
-                let password = prompt("Contraseña:");
-                if (password !== "cc") {
-                    alert("Contraseña incorrecta.");
-                    document.getElementById('lock-toggle').checked = true;
-                    return; 
-                }
-            }
-            modoBloqueado = estado; 
-            localStorage.setItem('notas_uni_lock', modoBloqueado); 
-            renderizarNotas(); 
+            if (!estado) { let password = prompt("Contraseña:"); if (password !== "cc") { alert("Contraseña incorrecta."); document.getElementById('lock-toggle').checked = true; return; } }
+            modoBloqueado = estado; localStorage.setItem('notas_uni_lock', modoBloqueado); renderizarNotas(); 
         }
 
-        function actRamoConfig(i, prop, val) {
-            let num = parseFloat(val);
-            if (!isNaN(num)) ramos[i][prop] = num;
-            renderizarNotas();
-        }
+        function actRamoConfig(i, prop, val) { let num = parseFloat(val); if (!isNaN(num)) ramos[i][prop] = num; renderizarNotas(); }
 
         function renderizarNotas() {
             let ramosAbiertos = [];
-            document.querySelectorAll('.ramo-body.abierto').forEach(el => {
-                let idx = el.id.replace('cuerpo-ramo-', '');
-                ramosAbiertos.push(parseInt(idx));
-            });
+            document.querySelectorAll('.ramo-body.abierto').forEach(el => { ramosAbiertos.push(parseInt(el.id.replace('cuerpo-ramo-', ''))); });
 
-            const cont = document.getElementById('contenedor-ramos');
-            cont.innerHTML = '';
+            const cont = document.getElementById('contenedor-ramos'); cont.innerHTML = '';
             document.getElementById('lock-toggle').checked = modoBloqueado;
             document.getElementById('btn-add-ramo').style.display = modoBloqueado ? 'none' : 'block';
             
-            const roAttr = modoBloqueado ? 'readonly' : '';
-            const hideSt = modoBloqueado ? 'style="display: none;"' : '';
+            const roAttr = modoBloqueado ? 'readonly' : ''; const hideSt = modoBloqueado ? 'style="display: none;"' : '';
 
             ramos.forEach((ramo, i) => {
                 let notaReq = parseFloat(ramo.notaAprobacion) || 4.0;
-                let limiteRojas = parseInt(ramo.maxRojas);
-                if (isNaN(limiteRojas)) limiteRojas = 99;
+                let limiteRojas = parseInt(ramo.maxRojas); if (isNaN(limiteRojas)) limiteRojas = 99;
 
                 let sumaN_validas = 0; let sumaP_validas = 0; let sumaP_total = 0;   
                 ramo.evaluaciones.forEach(ev => {
-                    let p = parseFloat(ev.porcentaje) || 0;
-                    let n;
+                    let p = parseFloat(ev.porcentaje) || 0; let n;
                     if (ev.esGrupoPonderado) {
                         let sumPond = 0, sumPV = 0;
-                        if(ev.subNotasPonderadas) {
-                            ev.subNotasPonderadas.forEach(sub => {
-                                let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0;
-                                if (!isNaN(sn) && sn > 0 && sp > 0) { sumPond += sn * (sp/100); sumPV += sp; }
-                            });
-                        }
+                        if(ev.subNotasPonderadas) { ev.subNotasPonderadas.forEach(sub => { let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0; if (!isNaN(sn) && sn > 0 && sp > 0) { sumPond += sn * (sp/100); sumPV += sp; } }); }
                         if(sumPV > 0) n = sumPond / (sumPV/100);
                     } else if (ev.esGrupo) {
-                        if(ev.subNotas) {
-                            let valid = ev.subNotas.map(x=>parseFloat(x)).filter(x=>!isNaN(x) && x>=1 && x<=7);
-                            if(valid.length > 0) n = valid.reduce((a,b)=>a+b,0) / valid.length;
-                        }
+                        if(ev.subNotas) { let valid = ev.subNotas.map(x=>parseFloat(x)).filter(x=>!isNaN(x) && x>=1 && x<=7); if(valid.length > 0) n = valid.reduce((a,b)=>a+b,0) / valid.length; }
                     } else { n = parseFloat(ev.nota); }
-                    if (p > 0) {
-                        sumaP_total += p;
-                        if (!isNaN(n) && n > 0) { sumaN_validas += (n * (p / 100)); sumaP_validas += p; }
-                    }
+                    if (p > 0) { sumaP_total += p; if (!isNaN(n) && n > 0) { sumaN_validas += (n * (p / 100)); sumaP_validas += p; } }
                 });
 
                 let porcentajeFaltantePara100 = 100 - sumaP_validas; 
@@ -629,11 +569,7 @@
                         let notaPrueba = p_test / 10;
                         let sumaSimulada = sumaN_validas + (notaPrueba * (porcentajeFaltantePara100 / 100));
                         let notaFinalSimulada = Math.round((sumaSimulada + epsilon) * 10) / 10;
-                        if (notaFinalSimulada >= notaReq) {
-                            notaMinimaCruda = notaPrueba;
-                            notaMinimaPendiente = "Mín " + notaMinimaCruda.toFixed(1);
-                            encontrada = true; break;
-                        }
+                        if (notaFinalSimulada >= notaReq) { notaMinimaCruda = notaPrueba; notaMinimaPendiente = "Mín " + notaMinimaCruda.toFixed(1); encontrada = true; break; }
                     }
                     if (!encontrada) { notaMinimaCruda = 8.0; notaMinimaPendiente = "Imp."; }
                 }
@@ -645,87 +581,30 @@
                     if (ev.esGrupoPonderado) {
                         if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
                         let sumPonderada = 0; let sumPorcentajesValidos = 0; let totalPorcentajeSuma = 0;
-                        ev.subNotasPonderadas.forEach(sub => {
-                            let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0;
-                            totalPorcentajeSuma += sp;
-                            if (!isNaN(sn) && sn > 0 && sp > 0) { sumPonderada += sn * (sp / 100); sumPorcentajesValidos += sp; }
-                        });
-                        if (sumPorcentajesValidos > 0) {
-                            ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(1);
-                            n = parseFloat(ev.nota);
-                        } else { ev.nota = ""; n = NaN; }
-                        
+                        ev.subNotasPonderadas.forEach(sub => { let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0; totalPorcentajeSuma += sp; if (!isNaN(sn) && sn > 0 && sp > 0) { sumPonderada += sn * (sp / 100); sumPorcentajesValidos += sp; } });
+                        if (sumPorcentajesValidos > 0) { ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(1); n = parseFloat(ev.nota); } else { ev.nota = ""; n = NaN; }
                         let advP = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
                         let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
 
-                        htmlEvaluaciones += `
-                            <div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;">
-                                <div class="evaluacion-row">
-                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}>
-                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio">
-                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr}>
-                                    <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
-                                </div>
-                                <div class="sub-evaluacion-container" style="border-left-color: var(--naranja-muteado); margin-bottom: 0;">
-                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas propias ${advP}</div>
-                                    ${ev.subNotasPonderadas.map((sub, k) => `
-                                        <div class="sub-evaluacion-row">
-                                            <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
-                                            <input type="text" inputmode="decimal" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="${sub.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
-                                            <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
-                                            <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
-                                        </div>`).join('')}
-                                    <button class="btn-add-sub" onclick="addEvSubPond(${i},${j})" ${hideSt}>+ AÑADIR NOTA PONDERADA</button>
-                                </div>
-                            </div>`;
+                        htmlEvaluaciones += `<div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;"><div class="evaluacion-row"><input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}><input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio"><input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr}><button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button></div><div class="sub-evaluacion-container" style="border-left-color: var(--naranja-muteado); margin-bottom: 0;"><div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas propias ${advP}</div>${ev.subNotasPonderadas.map((sub, k) => `<div class="sub-evaluacion-row"><span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span><input type="text" inputmode="decimal" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="${sub.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}"><input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}><button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button></div>`).join('')}<button class="btn-add-sub" onclick="addEvSubPond(${i},${j})" ${hideSt}>+ AÑADIR NOTA PONDERADA</button></div></div>`;
                     } else if (ev.esGrupo) {
-                        if (!ev.subNotas) ev.subNotas = [""]; 
-                        let validSubNotas = ev.subNotas.map(x => parseFloat(x)).filter(x => !isNaN(x) && x >= 1 && x <= 7);
-                        let sumSub = validSubNotas.reduce((a, b) => a + b, 0);
-                        ev.nota = validSubNotas.length > 0 ? (sumSub / validSubNotas.length).toFixed(1) : "";
-                        n = parseFloat(ev.nota);
+                        if (!ev.subNotas) ev.subNotas = [""]; let validSubNotas = ev.subNotas.map(x => parseFloat(x)).filter(x => !isNaN(x) && x >= 1 && x <= 7); let sumSub = validSubNotas.reduce((a, b) => a + b, 0);
+                        ev.nota = validSubNotas.length > 0 ? (sumSub / validSubNotas.length).toFixed(1) : ""; n = parseFloat(ev.nota);
                         let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
-                        
-                        htmlEvaluaciones += `
-                            <div style="margin-bottom: 25px;">
-                                <div class="evaluacion-row">
-                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE" ${roAttr}>
-                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);">
-                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
-                                    <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
-                                </div>
-                                <div class="sub-evaluacion-container">
-                                    ${ev.subNotas.map((sub, k) => `
-                                        <div class="sub-evaluacion-row">
-                                            <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
-                                            <input type="text" inputmode="decimal" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="${sub === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
-                                            <button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button>
-                                        </div>`).join('')}
-                                    <button class="btn-add-sub" onclick="addEvSub(${i},${j})" ${hideSt}>+ AÑADIR TEST</button>
-                                </div>
-                            </div>`;
+                        htmlEvaluaciones += `<div style="margin-bottom: 25px;"><div class="evaluacion-row"><input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE" ${roAttr}><input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);"><input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}><button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button></div><div class="sub-evaluacion-container">${ev.subNotas.map((sub, k) => `<div class="sub-evaluacion-row"><span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600;">Test ${k+1}</span><input type="text" inputmode="decimal" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="${sub === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}"><button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button></div>`).join('')}<button class="btn-add-sub" onclick="addEvSub(${i},${j})" ${hideSt}>+ AÑADIR TEST</button></div></div>`;
                     } else {
                         n = parseFloat(ev.nota);
-                        htmlEvaluaciones += `
-                            <div class="evaluacion-row">
-                                <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}>
-                                <input type="text" inputmode="decimal" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="${ev.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'NOTA'}">
-                                <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
-                                <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
-                            </div>`;
+                        htmlEvaluaciones += `<div class="evaluacion-row"><input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}><input type="text" inputmode="decimal" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="${ev.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'NOTA'}"><input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}><button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button></div>`;
                     }
-
-                    let p = parseFloat(ev.porcentaje) || 0;
-                    if ((ev.nombre.trim() !== "" || p > 0) && (isNaN(n) || ev.nota === "")) faltanNotas = true;
+                    let p = parseFloat(ev.porcentaje) || 0; if ((ev.nombre.trim() !== "" || p > 0) && (isNaN(n) || ev.nota === "")) faltanNotas = true;
                     if (!isNaN(n) && n > 0 && p > 0) { if (n < 4.0) notasRojasCount++; }
                 });
 
                 let notaFinalRedondeada = Math.round((sumaN_validas + epsilon) * 10) / 10;
                 let msg = ""; let colorNotaFinal = "var(--verde-muteado)"; 
 
-                if (notasRojasCount > limiteRojas) {
-                    msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`; colorNotaFinal = "var(--rojo-muteado)"; 
-                } else if (sumaP_validas < 100) {
+                if (notasRojasCount > limiteRojas) { msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`; colorNotaFinal = "var(--rojo-muteado)"; } 
+                else if (sumaP_validas < 100) {
                     if (sumaP_validas === 0) msg = `<div class="nota-necesaria">INGRESA NOTAS PARA CALCULAR.</div>`;
                     else {
                         if(notaMinimaCruda <= 1.0 && notaMinimaPendiente !== "") msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`;
@@ -737,59 +616,20 @@
                     else { msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`; }
                 }
 
-                let err = sumaP_total > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP_total}%.</div>` : '';
-                let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
-                let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
+                let err = sumaP_total > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP_total}%.</div>` : ''; let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : ''; let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
 
-                cont.innerHTML += `
-                    <div>
-                        <div class="ramo-header-acordeon ${claseAbierto}" onclick="toggleAcordeon(this, 'cuerpo-ramo-${i}')">
-                            <div class="titulo-wrapper" onclick="if(!modoBloqueado) event.stopPropagation()"><input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}></div>
-                            <div class="header-actions"><button class="btn-remove btn-remove-ramo" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button><div style="padding: 10px; cursor: pointer; display: flex;"><span class="arrow"></span></div></div>
-                        </div>
-                        <div id="cuerpo-ramo-${i}" class="ramo-body ${claseAbierto}">
-                            <div class="ramo-config" ${hideSt}>
-                                <span><strong>RESTRICCIONES:</strong></span>
-                                <label>APROBACIÓN: <input type="number" step="0.1" min="1" max="7" value="${notaReq}" onchange="actRamoConfig(${i}, 'notaAprobacion', this.value)" ${roAttr}></label>
-                                <label>LÍMITE DE ROJAS: <input type="number" min="0" value="${limiteRojas}" onchange="actRamoConfig(${i}, 'maxRojas', this.value)" ${roAttr}></label>
-                            </div>
-                            <div>${htmlEvaluaciones}</div>
-                            <div class="botones-agregar" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
-                                <button class="btn-add-eval" onclick="addEv(${i})" ${hideSt}>+ AGREGAR EVALUACIÓN</button>
-                                <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ GRUPO TESTS</button>
-                                <button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO POND (EJ: RA)</button>
-                            </div>
-                            <div class="resultados">
-                                <div><div style="color: var(--gris-claro);">TOTAL PONDERADO: <strong style="color: var(--negro);">${sumaP_total}%</strong></div>${msg}${err}</div>
-                                <div class="nota-final" style="color: ${colorNotaFinal}">${htmlFaltanNotas}${sumaN_validas > 0 ? sumaN_validas.toFixed(2) : '0.00'}</div>
-                            </div>
-                        </div>
-                    </div>`;
+                cont.innerHTML += `<div><div class="ramo-header-acordeon ${claseAbierto}" onclick="toggleAcordeon(this, 'cuerpo-ramo-${i}')"><div class="titulo-wrapper" onclick="if(!modoBloqueado) event.stopPropagation()"><input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}></div><div class="header-actions"><button class="btn-remove btn-remove-ramo" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button><div style="padding: 10px; cursor: pointer; display: flex;"><span class="arrow"></span></div></div></div><div id="cuerpo-ramo-${i}" class="ramo-body ${claseAbierto}"><div class="ramo-config" ${hideSt}><span><strong>RESTRICCIONES:</strong></span><label>APROBACIÓN: <input type="number" step="0.1" min="1" max="7" value="${notaReq}" onchange="actRamoConfig(${i}, 'notaAprobacion', this.value)" ${roAttr}></label><label>LÍMITE DE ROJAS: <input type="number" min="0" value="${limiteRojas}" onchange="actRamoConfig(${i}, 'maxRojas', this.value)" ${roAttr}></label></div><div>${htmlEvaluaciones}</div><div class="botones-agregar" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;"><button class="btn-add-eval" onclick="addEv(${i})" ${hideSt}>+ AGREGAR EVALUACIÓN</button><button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ GRUPO TESTS</button><button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO POND (EJ: RA)</button></div><div class="resultados"><div><div style="color: var(--gris-claro);">TOTAL PONDERADO: <strong style="color: var(--negro);">${sumaP_total}%</strong></div>${msg}${err}</div><div class="nota-final" style="color: ${colorNotaFinal}">${htmlFaltanNotas}${sumaN_validas > 0 ? sumaN_validas.toFixed(2) : '0.00'}</div></div></div></div>`;
             });
-            // NO auto-guardar aqui para evitar loop infinito en escritura rapida. Se guarda con interaccion en botones.
         }
 
-        function agregarRamo() { 
-            let notaApp = prompt("¿Con qué nota se aprueba este ramo? (Ej: 4.0)", "4.0"); if (notaApp === null) return; 
-            let rojas = prompt("¿Límite de rojas? (0 para no permitir ninguna, 99 sin límite)", "99"); if (rojas === null) return; 
-            let maxR = parseInt(rojas); if (isNaN(maxR) || rojas.trim() === "") maxR = 99;
-            ramos.push({ nombre: "", notaAprobacion: parseFloat(notaApp) || 4.0, maxRojas: maxR, evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] }); 
-            renderizarNotas(); guardarDatosGlobal();
-        }
+        function agregarRamo() { let notaApp = prompt("¿Con qué nota se aprueba este ramo? (Ej: 4.0)", "4.0"); if (notaApp === null) return; let rojas = prompt("¿Límite de rojas? (0 para no permitir ninguna, 99 sin límite)", "99"); if (rojas === null) return; let maxR = parseInt(rojas); if (isNaN(maxR) || rojas.trim() === "") maxR = 99; ramos.push({ nombre: "", notaAprobacion: parseFloat(notaApp) || 4.0, maxRojas: maxR, evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] }); renderizarNotas(); guardarDatosGlobal(); }
         function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); guardarDatosGlobal();} }
         function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); guardarDatosGlobal();}
         function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); guardarDatosGlobal();}
         function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); guardarDatosGlobal();}
         function addEvGrupoPonderado(i) { ramos[i].evaluaciones.push({ nombre: "RA 1", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: true, subNotasPonderadas: [{ nota: "", porcentaje: "60" }, { nota: "", porcentaje: "40" }] }); renderizarNotas(); guardarDatosGlobal();}
         function delEv(i, j) { ramos[i].evaluaciones.splice(j, 1); renderizarNotas(); guardarDatosGlobal();}
-        
-        function actEv(i, j, c, v) { 
-            if (c === 'nota' && v !== "") {
-                v = v.replace(',', '.'); let num = parseFloat(v);
-                if (isNaN(num) || num < 1 || num > 7) { alert("Nota no válida."); v = ""; } else { v = num; }
-            }
-            ramos[i].evaluaciones[j][c] = v; renderizarNotas(); guardarDatosGlobal();
-        }
+        function actEv(i, j, c, v) { if (c === 'nota' && v !== "") { v = v.replace(',', '.'); let num = parseFloat(v); if (isNaN(num) || num < 1 || num > 7) { alert("Nota no válida."); v = ""; } else { v = num; } } ramos[i].evaluaciones[j][c] = v; renderizarNotas(); guardarDatosGlobal(); }
         function addEvSub(i, j) { ramos[i].evaluaciones[j].subNotas.push(""); renderizarNotas(); guardarDatosGlobal();}
         function delEvSub(i, j, k) { ramos[i].evaluaciones[j].subNotas.splice(k, 1); renderizarNotas(); guardarDatosGlobal();}
         function actEvSub(i, j, k, v) {
@@ -808,22 +648,12 @@
         const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
         const diasSemana = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
 
-        function cambiarMes(direccion) {
-            mesActual += direccion;
-            if (mesActual > 11) { mesActual = 0; anioActual++; }
-            if (mesActual < 0) { mesActual = 11; anioActual--; }
-            renderizarCalendario();
-        }
-
+        function cambiarMes(direccion) { mesActual += direccion; if (mesActual > 11) { mesActual = 0; anioActual++; } if (mesActual < 0) { mesActual = 11; anioActual--; } renderizarCalendario(); }
         function renderizarCalendario() {
-            const grid = document.getElementById('calendario-grid');
-            document.getElementById('mes-anio-display').textContent = `${nombresMeses[mesActual]} ${anioActual}`;
-            grid.innerHTML = '';
+            const grid = document.getElementById('calendario-grid'); document.getElementById('mes-anio-display').textContent = `${nombresMeses[mesActual]} ${anioActual}`; grid.innerHTML = '';
             diasSemana.forEach(dia => { grid.innerHTML += `<div class="cal-day-name">${dia}</div>`; });
-            const primerDia = new Date(anioActual, mesActual, 1).getDay();
-            const diasMes = new Date(anioActual, mesActual + 1, 0).getDate();
+            const primerDia = new Date(anioActual, mesActual, 1).getDay(); const diasMes = new Date(anioActual, mesActual + 1, 0).getDate();
             for (let i = 0; i < primerDia; i++) grid.innerHTML += `<div class="cal-cell empty"></div>`;
-            
             let hoy = new Date();
             for (let dia = 1; dia <= diasMes; dia++) {
                 let fStr = `${anioActual}-${String(mesActual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
@@ -834,37 +664,27 @@
             }
             renderizarListaEventos();
         }
-
         function renderizarListaEventos() {
             const cont = document.getElementById('contenedor-lista-eventos'); cont.innerHTML = '';
             let ordenados = [...eventosCalendario].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
             if(ordenados.length === 0) { cont.innerHTML = '<p style="color:#888; font-size:0.85em; text-align:center;">Vacio.</p>'; return; }
-            ordenados.forEach(ev => {
-                const [a, m, d] = ev.fecha.split('-');
-                cont.innerHTML += `<div class="evento-item" style="border-left-color: ${ev.color}"><div class="evento-info"><span class="evento-titulo">${ev.nombre}</span><span class="evento-fecha">${d}/${m}/${a}</span></div><button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})">&times;</button></div>`;
-            });
+            ordenados.forEach(ev => { const [a, m, d] = ev.fecha.split('-'); cont.innerHTML += `<div class="evento-item" style="border-left-color: ${ev.color}"><div class="evento-info"><span class="evento-titulo">${ev.nombre}</span><span class="evento-fecha">${d}/${m}/${a}</span></div><button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})">&times;</button></div>`; });
         }
-
         function guardarNuevoEvento() {
             const nom = document.getElementById('ev-nombre').value; const fec = document.getElementById('ev-fecha').value; const col = document.getElementById('ev-color').value;
-            if(!nom || !fec) { alert("Completa nombre y fecha."); return; }
-            eventosCalendario.push({ id: Date.now(), nombre: nom, fecha: fec, color: col });
-            document.getElementById('ev-nombre').value = ''; document.getElementById('ev-fecha').value = '';
-            guardarDatosGlobal(); renderizarCalendario();
+            if(!nom || !fec) { alert("Completa nombre y fecha."); return; } eventosCalendario.push({ id: Date.now(), nombre: nom, fecha: fec, color: col });
+            document.getElementById('ev-nombre').value = ''; document.getElementById('ev-fecha').value = ''; guardarDatosGlobal(); renderizarCalendario();
         }
         function borrarEvento(id) { eventosCalendario = eventosCalendario.filter(ev => ev.id !== id); guardarDatosGlobal(); renderizarCalendario(); }
-
         function renderizarFechasPendientes() {
             const cont = document.getElementById('contenedor-fechas-pendientes'); cont.innerHTML = '';
             ramos.forEach((ramo, i) => {
-                if (!ramo.nombre) return; 
-                let html = '';
+                if (!ramo.nombre) return;  let html = '';
                 ramo.evaluaciones.forEach(ev => {
                     if (!ev.nombre) return; 
                     const qExact = `${ev.nombre.trim()} - ${ramo.nombre.trim()}`.toLowerCase();
                     const enc = eventosCalendario.find(e => e.nombre.toLowerCase() === qExact || (e.nombre.toLowerCase().includes(ev.nombre.toLowerCase()) && e.nombre.toLowerCase().includes(ramo.nombre.toLowerCase())));
-                    let p = `<span class="pill-sin-fecha">SIN FECHA</span>`;
-                    if (enc) { const [a,m,d] = enc.fecha.split('-'); p = `<span class="pill-con-fecha">${d}/${m}/${a}</span>`; }
+                    let p = `<span class="pill-sin-fecha">SIN FECHA</span>`; if (enc) { const [a,m,d] = enc.fecha.split('-'); p = `<span class="pill-con-fecha">${d}/${m}/${a}</span>`; }
                     html += `<div class="fila-fecha-pendiente"><span>${ev.nombre}</span>${p}</div>`;
                 });
                 if (html === '') html = '<div style="padding:15px; color:#888; font-size: 0.85em;">Vacío</div>';
@@ -875,14 +695,13 @@
             const [a, m, d] = fec.split('-'); const part = nom.split('-');
             document.getElementById('modal-titulo').innerText = part[0].trim(); document.getElementById('modal-titulo').style.color = col;
             document.getElementById('modal-fecha').innerText = `${d}/${m}/${a}`;
-            let t = document.getElementById('modal-ramo-tag'); t.innerText = part.length>1?part[1].trim():'Eval'; t.style.backgroundColor = col;
-            document.getElementById('modal-evaluacion').classList.remove('oculto');
+            let t = document.getElementById('modal-ramo-tag'); t.innerText = part.length>1?part[1].trim():'Eval'; t.style.backgroundColor = col; document.getElementById('modal-evaluacion').classList.remove('oculto');
         }
         function cerrarModal() { document.getElementById('modal-evaluacion').classList.add('oculto'); }
 
 
         // ==========================================
-        // SECCIÓN 3: LÓGICA PREDICCIONES
+        // SECCIÓN 3: LÓGICA PREDICCIONES Y DICCIONARIO
         // ==========================================
 
         function formatDateParaMostrar(dateString) {
@@ -1206,7 +1025,6 @@
                 let bodyHtml = '';
 
                 if (estado === 'ABIERTO') {
-                    // Formulario
                     let yaPredijo = ''; 
                     if (nombreUsuarioPred) {
                         let obj = ev.predicciones.find(p => p.nombre.toLowerCase() === nombreUsuarioPred.toLowerCase());
