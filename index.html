@@ -9,14 +9,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Panel U">
-    <!-- Icono dinámico elegante (Fondo negro, Letra Beige) -->
+    <!-- Icono dinámico -->
     <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
     <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=U&background=1A1A1A&color=F5F3EC&size=180&bold=true&font-size=0.5">
 
-    <!-- Fuente Inter de Google Fonts -->
+    <!-- Fuentes Inter y Anton de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -46,16 +46,10 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        h1, h2, h3, h4 {
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            color: var(--negro);
-        }
-
+        h1, h2, h3, h4 { text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: var(--negro); }
         h1 { text-align: center; margin-bottom: 30px; font-size: 2em; letter-spacing: 3px; }
 
-        input { font-size: 16px; font-family: 'Inter', sans-serif; }
+        input, select { font-size: 16px; font-family: 'Inter', sans-serif; }
         button { min-height: 40px; font-family: 'Inter', sans-serif; }
 
         /* --- MENÚ DE NAVEGACIÓN --- */
@@ -76,60 +70,32 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- SECCIÓN 1: CALCULADORA DE NOTAS --- */
-        .config-bar {
-            background: var(--blanco); padding: 20px; border-radius: 4px; margin-bottom: 25px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border: 1px solid var(--beige-oscuro);
-        }
+        .config-bar { background: var(--blanco); padding: 20px; border-radius: 4px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--beige-oscuro); }
         .lock-label { font-weight: 600; cursor: pointer; color: var(--negro); display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px;}
         .lock-label input { transform: scale(1.2); cursor: pointer; accent-color: var(--negro); }
 
-        /* Estilos del Acordeón de Notas */
-        .ramo-header-acordeon { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px 25px; background: var(--blanco); border-radius: 4px; 
-            cursor: pointer; margin-bottom: 5px; transition: background 0.2s;
-            border: 1px solid var(--beige-oscuro);
-        }
+        .ramo-header-acordeon { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: var(--blanco); border-radius: 4px; cursor: pointer; margin-bottom: 5px; transition: background 0.2s; border: 1px solid var(--beige-oscuro); }
         .ramo-header-acordeon:hover { background: #FCFBFA; }
-        .ramo-header-acordeon input { 
-            font-size: 1.2em; font-weight: 600; color: var(--negro); border: none; 
-            background: transparent; width: 100%; outline: none; border-bottom: 1px solid transparent;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
+        .ramo-header-acordeon input { font-size: 1.2em; font-weight: 600; color: var(--negro); border: none; background: transparent; width: 100%; outline: none; border-bottom: 1px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
         .ramo-header-acordeon input:focus:not([readonly]) { border-bottom: 1px solid var(--negro); }
-        .ramo-header-acordeon input[readonly] { 
-            border: none; cursor: pointer; color: var(--negro); 
-            pointer-events: none; 
-        }
+        .ramo-header-acordeon input[readonly] { border: none; cursor: pointer; color: var(--negro); pointer-events: none; }
         
         .titulo-wrapper { flex: 1; margin-right: 10px; min-width: 0; }
         .header-actions { display: flex; align-items: center; }
-        
         .arrow { font-size: 1.5em; color: var(--negro); user-select: none; font-weight: 300; display: inline-block; width: 20px; text-align: center; }
         .arrow::after { content: '+'; }
         .ramo-header-acordeon.abierto .arrow::after, .acordeon-header.abierto .arrow::after { content: '-'; }
         
-        .ramo-body { 
-            background: var(--blanco); border-radius: 0 0 4px 4px; padding: 25px; 
-            margin-bottom: 25px; border: 1px solid var(--beige-oscuro);
-            display: none; border-top: none; margin-top: -5px;
-        }
+        .ramo-body { background: var(--blanco); border-radius: 0 0 4px 4px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--beige-oscuro); display: none; border-top: none; margin-top: -5px; }
         .ramo-body.abierto { display: block; }
 
-        /* Configuración interna del ramo */
-        .ramo-config {
-            display: flex; gap: 20px; margin-bottom: 25px; background: transparent; 
-            padding: 15px; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--beige-oscuro);
-            align-items: center; flex-wrap: wrap; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .ramo-config { display: flex; gap: 20px; margin-bottom: 25px; background: transparent; padding: 15px; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--beige-oscuro); align-items: center; flex-wrap: wrap; text-transform: uppercase; letter-spacing: 0.5px; }
         .ramo-config label { display: flex; align-items: center; gap: 10px; color: var(--gris-oscuro); font-weight: 600; }
         .ramo-config input { padding: 8px; border: 1px solid var(--beige-oscuro); border-radius: 2px; width: 60px; text-align: center; }
         
         .evaluacion-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
         .evaluacion-row input { padding: 12px; border: 1px solid var(--beige-oscuro); border-radius: 2px; box-sizing: border-box; }
         
-        /* Sub-evaluaciones (Tests) */
         .sub-evaluacion-container { margin-left: 20px; padding: 20px; background: var(--bg-beige); border-left: 2px solid var(--negro); margin-bottom: 20px; }
         .sub-evaluacion-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
         .sub-evaluacion-row input { padding: 10px; border: 1px solid var(--beige-oscuro); border-radius: 2px; width: 80px; text-align: center; font-weight: 600;}
@@ -143,38 +109,19 @@
         .input-porcentaje { flex: 1; text-align: center; }
         
         /* Botones minimalistas */
-        button { 
-            border: none; padding: 12px 20px; border-radius: 2px; cursor: pointer; 
-            font-weight: 600; transition: all 0.3s; text-transform: uppercase; 
-            letter-spacing: 1px; font-size: 0.8em; 
-        }
-        
-        .btn-add-ramo, .btn-add-eval, .btn-add-grupo, .btn-guardar-evento { 
-            background-color: var(--negro); color: var(--blanco); border: 1px solid var(--negro);
-        }
-        .btn-add-grupo-pond { 
-            background-color: var(--naranja-muteado); color: var(--blanco); border: 1px solid var(--naranja-muteado); 
-        }
-        .btn-add-ramo:hover, .btn-add-eval:hover, .btn-add-grupo:hover, .btn-guardar-evento:hover { 
-            background-color: var(--gris-oscuro); 
-        }
+        button { border: none; padding: 12px 20px; border-radius: 2px; cursor: pointer; font-weight: 600; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8em; }
+        .btn-add-ramo, .btn-add-eval, .btn-add-grupo, .btn-guardar-evento { background-color: var(--negro); color: var(--blanco); border: 1px solid var(--negro); }
+        .btn-add-grupo-pond { background-color: var(--naranja-muteado); color: var(--blanco); border: 1px solid var(--naranja-muteado); }
+        .btn-add-ramo:hover, .btn-add-eval:hover, .btn-add-grupo:hover, .btn-guardar-evento:hover { background-color: var(--gris-oscuro); }
         .btn-add-grupo-pond:hover { background-color: #8a622c; }
-
         .btn-add-sub { background-color: var(--blanco); color: var(--negro); border: 1px solid var(--negro); }
         .btn-add-sub:hover { background-color: var(--bg-beige); }
-
         .btn-remove { background-color: transparent; color: var(--rojo-muteado); border: 1px solid var(--rojo-muteado); padding: 12px 15px; }
         .btn-remove:hover { background-color: var(--rojo-muteado); color: var(--blanco); }
-        
         .btn-remove-ramo { margin-right: 15px; }
         .btn-remove-sub { padding: 10px 12px; }
 
-        .resultados { 
-            margin-top: 30px; padding: 25px; background-color: var(--bg-beige); 
-            border: 1px solid var(--beige-oscuro); border-radius: 4px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.9em;
-        }
+        .resultados { margin-top: 30px; padding: 25px; background-color: var(--bg-beige); border: 1px solid var(--beige-oscuro); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.9em; }
         .nota-final { font-size: 2.2em; font-weight: 700; text-align: right; transition: color 0.3s; letter-spacing: 0; }
         .alerta-porcentaje { color: var(--rojo-muteado); font-size: 0.85em; margin-top: 10px; font-weight: 600; }
         .nota-necesaria { font-weight: 600; margin-top: 5px; }
@@ -182,26 +129,22 @@
         /* --- SECCIÓN 2: CALENDARIO --- */
         .calendario-layout { display: grid; grid-template-columns: 1fr; gap: 25px; }
         @media (min-width: 800px) { .calendario-layout { grid-template-columns: 2.2fr 1fr; } }
-
         .cal-container { background: var(--blanco); border-radius: 4px; padding: 25px; border: 1px solid var(--beige-oscuro); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .cal-header button { background: transparent; border: 1px solid var(--negro); color: var(--negro); padding: 8px 15px; font-size: 1.2em; border-radius: 2px;}
         .cal-header button:hover { background: var(--negro); color: var(--blanco); }
         .cal-header h2 { margin: 0; }
-
         .leyenda-container { margin-bottom: 25px; padding: 15px; background: var(--bg-beige); border-radius: 4px; border: 1px solid var(--beige-oscuro);}
         .leyenda-container h4 { margin: 0 0 15px 0; font-size: 0.85em; }
         .leyenda-lista { display: flex; flex-wrap: wrap; gap: 20px; }
         .leyenda-item { display: flex; align-items: center; font-size: 0.85em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         .leyenda-color { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
-
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 2px solid var(--negro); border-left: 1px solid var(--beige-oscuro); }
         .cal-day-name { background: var(--bg-beige); color: var(--gris-oscuro); font-weight: 600; text-align: center; padding: 12px 0; border-right: 1px solid var(--beige-oscuro); border-bottom: 1px solid var(--beige-oscuro); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
         .cal-cell { min-height: 100px; border-right: 1px solid var(--beige-oscuro); border-bottom: 1px solid var(--beige-oscuro); padding: 8px; background: var(--blanco); display: flex; flex-direction: column; }
         .cal-cell.empty { background: #FAFAFA; }
         .cal-date { font-weight: 600; color: var(--gris-claro); font-size: 0.9em; margin-bottom: 5px; align-self: flex-end;}
         .cal-cell.today .cal-date { background: var(--negro); color: var(--blanco); border-radius: 2px; width: 24px; height: 24px; text-align: center; line-height: 24px; }
-        
         .contenedor-puntos { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px; }
         .evento-punto { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
         .evento-punto:hover { transform: scale(1.3); }
@@ -210,7 +153,7 @@
         .form-evento h3 { margin-top: 0; border-bottom: 1px solid var(--beige-oscuro); padding-bottom: 15px; margin-bottom: 20px;}
         .form-grupo { margin-bottom: 20px; }
         .form-grupo label { display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
-        .form-grupo input { width: 100%; padding: 12px; border: 1px solid var(--beige-oscuro); border-radius: 2px; box-sizing: border-box;}
+        .form-grupo input, .form-grupo select { width: 100%; padding: 12px; border: 1px solid var(--beige-oscuro); border-radius: 2px; box-sizing: border-box;}
         .form-grupo input[type="color"] { padding: 0; height: 45px; cursor: pointer; border: 1px solid var(--beige-oscuro);}
         .form-ayuda { font-size: 0.75em; color: var(--gris-claro); margin-top: 6px; display: block;}
         .btn-guardar-evento { width: 100%; margin-top: 10px;}
@@ -224,43 +167,95 @@
         .btn-borrar-evento { background: transparent; color: var(--rojo-muteado); padding: 5px 10px; font-size: 1.2em; border: none; font-weight: 300;}
         .btn-borrar-evento:hover { background: transparent; color: #000; }
 
-        /* --- ESTADO DE EVALUACIONES --- */
         .seccion-fechas-pendientes { margin-top: 50px; }
         .seccion-fechas-pendientes h2 { border-bottom: 2px solid var(--negro); padding-bottom: 15px; margin-bottom: 25px;}
-        
-        .acordeon-header { 
-            background: var(--blanco); color: var(--negro); padding: 20px; 
-            border-radius: 4px; cursor: pointer; display: flex; 
-            justify-content: space-between; align-items: center; 
-            margin-bottom: 5px; transition: background 0.3s; border: 1px solid var(--beige-oscuro);
-        }
+        .acordeon-header { background: var(--blanco); color: var(--negro); padding: 20px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; transition: background 0.3s; border: 1px solid var(--beige-oscuro); }
         .acordeon-header:hover { background: #FCFBFA; }
         .acordeon-header h3 { margin: 0; font-size: 1em; display: flex; align-items: center; gap: 12px; letter-spacing: 1px;}
         .icono-ramo { display: inline-block; width: 10px; height: 10px; background: var(--negro); border-radius: 50%; }
-        
-        .acordeon-body { 
-            background: var(--blanco); padding: 10px 20px 20px 20px; border-radius: 0 0 4px 4px; 
-            margin-bottom: 25px; border: 1px solid var(--beige-oscuro); border-top: none; 
-            display: none; margin-top: -5px;
-        }
+        .acordeon-body { background: var(--blanco); padding: 10px 20px 20px 20px; border-radius: 0 0 4px 4px; margin-bottom: 25px; border: 1px solid var(--beige-oscuro); border-top: none; display: none; margin-top: -5px; }
         .acordeon-body.abierto { display: block; }
-        
         .fila-fecha-pendiente { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-bottom: 1px solid var(--bg-beige); font-size: 0.9em; font-weight: 600; text-transform: uppercase;}
         .fila-fecha-pendiente:last-child { border-bottom: none; }
-        
         .pill-sin-fecha { background: var(--bg-beige); color: var(--naranja-muteado); padding: 8px 15px; border-radius: 2px; font-size: 0.8em; font-weight: 700; text-align: center; border: 1px solid #EAE3D5;}
         .pill-con-fecha { background: var(--bg-beige); color: var(--verde-muteado); padding: 8px 15px; border-radius: 2px; font-size: 0.8em; font-weight: 700; text-align: center; border: 1px solid #EAE3D5;}
 
-        /* --- MODAL EMERGENTE --- */
+        /* --- MODALES --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26,26,26,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; transition: opacity 0.3s;}
         .modal.oculto { visibility: hidden; opacity: 0; }
-        .modal-contenido { background: var(--blanco); padding: 35px; border-radius: 4px; min-width: 320px; position: relative; transform: translateY(0); transition: transform 0.3s;}
+        .modal-contenido { background: var(--blanco); padding: 35px; border-radius: 4px; min-width: 320px; max-width: 500px; width: 90%; position: relative; transform: translateY(0); transition: transform 0.3s;}
         .modal.oculto .modal-contenido { transform: translateY(-20px); }
         .cerrar-modal { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 2em; font-weight: 300; color: var(--gris-claro); padding: 5px;}
         .cerrar-modal:hover { color: var(--negro); }
         #modal-titulo { margin-top: 0; padding-right: 30px; border-bottom: 1px solid var(--beige-oscuro); padding-bottom: 15px; margin-bottom: 15px;}
         #modal-fecha { font-weight: 600; color: var(--gris-oscuro); font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
         #modal-ramo-tag { display: inline-block; padding: 6px 12px; border-radius: 2px; font-size: 0.75em; color: var(--blanco); font-weight: 700; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* ==========================================
+           SECCIÓN 3: PREDICCIONES (ESTILO PÓSTER)
+           ========================================== */
+        .font-anton { font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .pred-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 40px;}
+        @media (min-width: 800px) { .pred-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .pred-card { background: var(--blanco); border-radius: 4px; overflow: hidden; border: 1px solid var(--beige-oscuro); box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column;}
+        
+        .pred-poster {
+            position: relative; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; color: var(--blanco);
+            background-color: var(--negro); background-size: cover; background-position: center;
+        }
+        .pred-poster::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(26,26,26,0) 0%, rgba(26,26,26,0.6) 40%, rgba(26,26,26,0.95) 100%); z-index: 1;
+        }
+        .pred-poster-content { position: relative; z-index: 2; text-align: center; }
+        
+        .pred-badges { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 2;}
+        .pred-badge { padding: 5px 10px; border-radius: 2px; font-size: 0.7em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--blanco);}
+        
+        .pred-opcion { font-size: 2.4em; line-height: 1.1; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);}
+        .pred-vs { font-size: 1.2em; color: var(--naranja-muteado); margin: 10px 0; letter-spacing: 5px; }
+        .pred-meta { font-size: 0.8em; color: #ccc; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .pred-body { padding: 25px; flex-grow: 1; display: flex; flex-direction: column;}
+        
+        /* Toggles de predicción */
+        .pred-toggles { display: flex; gap: 10px; margin-bottom: 20px;}
+        .pred-toggle { flex: 1; text-align: center; padding: 12px 5px; border: 1px solid var(--beige-oscuro); border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.85em; text-transform: uppercase; transition: all 0.2s;}
+        .pred-toggle:hover { background: var(--bg-beige); }
+        .pred-toggle.selected { background: var(--negro); color: var(--blanco); border-color: var(--negro); }
+        
+        .pred-inputs-mma { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn-pred-submit { width: 100%; background: var(--verde-muteado); margin-top: 20px; border-color: var(--verde-muteado);}
+        .btn-pred-submit:hover { background: #2f4535; }
+        
+        .pred-msg-cerrado { text-align: center; padding: 20px; background: var(--bg-beige); border-radius: 2px; color: var(--gris-oscuro); font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
+        .btn-cargar-res { width: 100%; background: transparent; color: var(--negro); border: 1px solid var(--negro); }
+        .btn-cargar-res:hover { background: var(--negro); color: var(--blanco); }
+
+        /* Lista de predicciones en la tarjeta */
+        .pred-lista { margin-top: 25px; border-top: 1px solid var(--beige-oscuro); padding-top: 15px;}
+        .pred-lista h4 { margin: 0 0 15px 0; font-size: 0.85em; color: var(--gris-oscuro); }
+        .pred-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85em;}
+        .pred-item:last-child { border-bottom: none; }
+        .pred-item strong { color: var(--negro); }
+        .pred-pts { font-weight: 700; color: var(--naranja-muteado); }
+
+        /* Tabla de Clasificación */
+        .ranking-container { background: var(--blanco); padding: 25px; border-radius: 4px; border: 1px solid var(--beige-oscuro); margin-bottom: 40px;}
+        .ranking-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .ranking-table th { border-bottom: 2px solid var(--negro); padding: 12px 10px; font-size: 0.85em; color: var(--gris-claro); text-transform: uppercase; letter-spacing: 1px;}
+        .ranking-table td { padding: 15px 10px; border-bottom: 1px solid var(--beige-oscuro); font-weight: 600; font-size: 0.95em;}
+        .medal { display: inline-block; width: 24px; height: 24px; border-radius: 50%; color: white; text-align: center; line-height: 24px; font-size: 0.8em; margin-right: 10px;}
+        .medal-1 { background-color: #D4AF37; } /* Oro */
+        .medal-2 { background-color: #C0C0C0; } /* Plata */
+        .medal-3 { background-color: #CD7F32; } /* Bronce */
+
+        /* Delete event float */
+        .btn-del-evento-pred { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); border: none; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 1.2em; padding: 0;}
+        .btn-del-evento-pred:hover { background: var(--rojo-muteado); }
 
         /* ==========================================
            ADAPTACIÓN PARA SMARTPHONES (MOVIL)
@@ -272,35 +267,17 @@
             .config-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; }
             .btn-add-ramo { width: 100%; }
 
-            .ramo-header-acordeon { 
-                flex-wrap: wrap; 
-                padding: 20px 15px; 
-            }
-            .titulo-wrapper { 
-                flex: 0 0 100%; 
-                margin-bottom: 15px; 
-                margin-right: 0;
-            }
+            .ramo-header-acordeon { flex-wrap: wrap; padding: 20px 15px; }
+            .titulo-wrapper { flex: 0 0 100%; margin-bottom: 15px; margin-right: 0;}
             .ramo-header-acordeon input { font-size: 1.15em; }
-            .header-actions { 
-                width: 100%; 
-                justify-content: space-between; 
-            }
+            .header-actions { width: 100%; justify-content: space-between; }
             .header-actions .btn-remove-ramo { margin-right: 0 !important; }
 
             .ramo-body { padding: 20px 15px; }
-
             .ramo-config { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px;}
             .ramo-config label { width: 100%; justify-content: space-between; }
 
-            .evaluacion-row { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr auto; 
-                gap: 10px; 
-                margin-bottom: 20px; 
-                border-bottom: 1px solid var(--beige-oscuro); 
-                padding-bottom: 20px;
-            }
+            .evaluacion-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--beige-oscuro); padding-bottom: 20px;}
             .evaluacion-row .input-nombre { grid-column: 1 / -1; }
             .evaluacion-row .input-nota { width: 100%; }
             .evaluacion-row .input-porcentaje { width: 100%; }
@@ -323,6 +300,13 @@
             .cal-day-name { font-size: 0.6em; padding: 8px 0; }
             .cal-cell { min-height: 60px; padding: 4px; }
             .cal-date { font-size: 0.7em; }
+
+            /* Predicciones Movil */
+            .pred-poster { min-height: 200px; padding: 20px; }
+            .pred-opcion { font-size: 1.8em; }
+            .pred-inputs-mma { grid-template-columns: 1fr; }
+            .ranking-container { padding: 15px; }
+            .ranking-table th, .ranking-table td { padding: 10px 5px; }
         }
     </style>
 </head>
@@ -332,6 +316,7 @@
     <nav class="navbar">
         <button class="nav-btn activo" onclick="cambiarSeccion('sec-notas', this)">NOTAS</button>
         <button class="nav-btn" onclick="cambiarSeccion('sec-calendario', this)">CALENDARIO</button>
+        <button class="nav-btn" onclick="cambiarSeccion('sec-predicciones', this)">PREDICCIONES</button>
     </nav>
 
     <!-- SECCIÓN 1: CALCULADORA -->
@@ -350,32 +335,26 @@
     <!-- SECCIÓN 2: CALENDARIO -->
     <div id="sec-calendario" class="seccion">
         <h1>Calendario de Evaluaciones</h1>
-        
         <div class="calendario-layout">
-            <!-- Izquierda: Calendario Visual -->
             <div class="cal-container">
                 <div class="cal-header">
                     <button onclick="cambiarMes(-1)">&larr;</button>
                     <h2 id="mes-anio-display">MES AÑO</h2>
                     <button onclick="cambiarMes(1)">&rarr;</button>
                 </div>
-                
                 <div class="leyenda-container">
                     <h4>RAMOS REGISTRADOS</h4>
                     <div id="leyenda-ramos" class="leyenda-lista"></div>
                 </div>
-
                 <div class="cal-grid" id="calendario-grid"></div>
             </div>
-
-            <!-- Derecha: Formulario y Lista -->
             <div>
                 <div class="form-evento">
                     <h3>AÑADIR EVALUACIÓN</h3>
                     <div class="form-grupo">
                         <label>EVALUACIÓN - RAMO</label>
                         <input type="text" id="ev-nombre" placeholder="Ej: Certamen 1 - Termodinámica">
-                        <span class="form-ayuda">Usa el guion (-) para separar el tipo de evaluación del nombre del ramo.</span>
+                        <span class="form-ayuda">Usa el guion (-) para separar.</span>
                     </div>
                     <div class="form-grupo">
                         <label>FECHA</label>
@@ -387,7 +366,6 @@
                     </div>
                     <button class="btn-guardar-evento" onclick="guardarNuevoEvento()">AGREGAR AL CALENDARIO</button>
                 </div>
-
                 <div class="lista-eventos-box">
                     <h3>PRÓXIMAS EVALUACIONES</h3>
                     <div id="contenedor-lista-eventos"></div>
@@ -395,20 +373,105 @@
             </div>
         </div>
 
-        <!-- NUEVA SUB-SECCIÓN: ESTADO DE FECHAS -->
         <div class="seccion-fechas-pendientes">
             <h2>GESTIÓN DE FECHAS POR RAMO</h2>
             <div id="contenedor-fechas-pendientes"></div>
         </div>
     </div>
 
-    <!-- MODAL EMERGENTE -->
+    <!-- SECCIÓN 3: PREDICCIONES -->
+    <div id="sec-predicciones" class="seccion">
+        <h1>Pronósticos Deportivos</h1>
+
+        <!-- Ranking General -->
+        <div class="ranking-container">
+            <h3>TABLA DE CLASIFICACIÓN GENERAL</h3>
+            <div id="contenedor-ranking"></div>
+        </div>
+
+        <!-- Botón para abrir modal de Crear Evento -->
+        <div style="margin-bottom: 40px; text-align: center;">
+            <button class="btn-guardar-evento" style="width: 100%; max-width: 400px; padding: 15px; font-size: 1em;" onclick="abrirModalCrearEvento()">+ CREAR NUEVO EVENTO</button>
+        </div>
+
+        <!-- Contenedor de Tarjetas Póster -->
+        <h2 style="border-bottom: 2px solid var(--negro); padding-bottom: 10px;">CARTELERA DE EVENTOS</h2>
+        <div id="contenedor-pred-cartelera" class="pred-grid"></div>
+
+    </div>
+
+    <!-- MODAL EMERGENTE CALENDARIO -->
     <div id="modal-evaluacion" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
             <h3 id="modal-titulo">Título</h3>
             <p id="modal-fecha">Fecha</p>
             <div id="modal-ramo-tag">Ramo</div>
+        </div>
+    </div>
+
+    <!-- MODAL CARGAR RESULTADO PREDICCIONES -->
+    <div id="modal-resultado-pred" class="modal oculto">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalPred()">&times;</span>
+            <h3 style="margin-top:0; border-bottom: 1px solid var(--beige-oscuro); padding-bottom:15px;">CARGAR RESULTADO REAL</h3>
+            <input type="hidden" id="modal-res-id">
+            <input type="hidden" id="modal-res-tipo">
+            
+            <div class="form-grupo" style="margin-top: 20px;">
+                <label>¿QUIÉN GANÓ?</label>
+                <div class="pred-toggles" id="modal-res-ganador-toggles"></div>
+                <input type="hidden" id="modal-res-ganador">
+            </div>
+
+            <div id="modal-res-exacto-container">
+                <!-- Se inyecta dinamicamente text o select MMA -->
+            </div>
+
+            <button class="btn-guardar-evento" style="margin-top: 25px; width: 100%;" onclick="guardarResultadoReal()">GUARDAR Y FINALIZAR EVENTO</button>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR EVENTO PREDICCIÓN -->
+    <div id="modal-crear-evento" class="modal oculto">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalCrearEvento()">&times;</span>
+            <h3 style="margin-top:0; border-bottom: 1px solid var(--beige-oscuro); padding-bottom:15px;">CREAR NUEVO EVENTO</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                <div class="form-grupo" style="margin:0;">
+                    <label>Tipo de Evento</label>
+                    <select id="pred-nuevo-tipo">
+                        <option value="Fútbol">Fútbol</option>
+                        <option value="MMA-UFC">MMA / UFC</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-grupo" style="margin:0;">
+                    <label>Título (Ej: UFC 300, Final Champions)</label>
+                    <input type="text" id="pred-nuevo-titulo" placeholder="Título del evento">
+                </div>
+                <div class="form-grupo" style="margin:0;">
+                    <label>Opción A (Equipo/Peleador)</label>
+                    <input type="text" id="pred-nuevo-a" placeholder="Nombre A">
+                </div>
+                <div class="form-grupo" style="margin:0;">
+                    <label>Opción B (Equipo/Peleador)</label>
+                    <input type="text" id="pred-nuevo-b" placeholder="Nombre B">
+                </div>
+                <div class="form-grupo" style="margin:0;">
+                    <label>Fecha y Hora del Evento</label>
+                    <input type="datetime-local" id="pred-nuevo-fecha">
+                </div>
+                <div class="form-grupo" style="margin:0;">
+                    <label>Cerrar predicciones (Horas antes)</label>
+                    <input type="number" id="pred-nuevo-horas" value="1" min="0" step="0.5">
+                </div>
+                <!-- Eliminado el campo Lugar -->
+                <!-- Eliminado el campo Imagen Fondo -->
+            </div>
+            
+            <button class="btn-guardar-evento" style="margin-top: 25px; width: 100%;" onclick="crearEventoPrediccion()">AGREGAR EVENTO DEPORTIVO</button>
         </div>
     </div>
 
@@ -439,49 +502,34 @@
         }
 
         // ==========================================
-        // LÓGICA SECCIÓN 1: NOTAS
+        // LÓGICA SECCIÓN 1 Y 2: NOTAS Y CALENDARIO
         // ==========================================
         const ramosDefaultNotas = [
             {
                 id: 1, nombre: "Termodinámica", notaAprobacion: 4.0, maxRojas: 99,
-                evaluaciones: [
-                    { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" },
-                    { id: 2, nombre: "Certamen 2", nota: "", porcentaje: "30" },
-                    { id: 3, nombre: "Examen", nota: "", porcentaje: "40" }
-                ]
-            },
-            {
-                id: 2, nombre: "Estática y Dinámica", notaAprobacion: 4.0, maxRojas: 99,
-                evaluaciones: [
-                    { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" },
-                    { id: 2, nombre: "Certamen 2", nota: "", porcentaje: "30" }
-                ]
+                evaluaciones: [ { id: 1, nombre: "Certamen 1", nota: "", porcentaje: "30" } ]
             }
         ];
-
-        const eventosDefault = [
-            { id: 1, nombre: "Certamen 1 - Ecuaciones Diferenciales", fecha: "2026-08-15", color: "#1A1A1A" },
-            { id: 2, nombre: "Laboratorio - Termodinámica", fecha: "2026-08-20", color: "#3E5A45" }
-        ];
+        const eventosDefault = [];
 
         let ramos = [];
         let eventosCalendario = [];
+        let eventosPredicciones = []; 
         
         let estadoLock = localStorage.getItem('notas_uni_lock');
         let modoBloqueado = estadoLock !== null ? estadoLock === 'true' : true; 
+        
+        // Anti-trampa predicciones
+        let nombreUsuarioPred = localStorage.getItem('pred_username') || '';
 
-        // Descarga inicial desde la Nube
+        // Descarga inicial
         async function cargarDatosDesdeNube() {
             try {
-                const { data, error } = await supabaseApp
-                    .from('panel_datos')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
+                const { data, error } = await supabaseApp.from('panel_datos').select('*').eq('id', 1).single();
                 if (data) {
                     ramos = data.ramos || ramosDefaultNotas;
                     eventosCalendario = data.calendario || eventosDefault;
+                    eventosPredicciones = data.predicciones || [];
                 } else {
                     ramos = ramosDefaultNotas;
                     eventosCalendario = eventosDefault;
@@ -490,29 +538,23 @@
                 ramos = ramosDefaultNotas;
                 eventosCalendario = eventosDefault;
             }
-
             renderizarNotas();
             renderizarCalendario();
             renderizarFechasPendientes();
+            renderizarPredicciones();
         }
 
-        // Subida de datos a la nube
-        async function guardarDatosNotas() { 
+        async function guardarDatosGlobal() { 
             await supabaseApp.from('panel_datos').upsert({ 
                 id: 1, 
-                ramos: ramos 
+                ramos: ramos,
+                calendario: eventosCalendario,
+                predicciones: eventosPredicciones
             });
             renderizarFechasPendientes(); 
+            renderizarPredicciones();
         }
 
-        async function guardarEventos() { 
-            await supabaseApp.from('panel_datos').upsert({ 
-                id: 1, 
-                calendario: eventosCalendario 
-            });
-            renderizarFechasPendientes();
-        }
-        
         function toggleBloqueo(estado) { 
             if (!estado) {
                 let password = prompt("Contraseña:");
@@ -534,7 +576,6 @@
         }
 
         function renderizarNotas() {
-            // Guardar estado de los ramos abiertos
             let ramosAbiertos = [];
             document.querySelectorAll('.ramo-body.abierto').forEach(el => {
                 let idx = el.id.replace('cuerpo-ramo-', '');
@@ -554,11 +595,7 @@
                 let limiteRojas = parseInt(ramo.maxRojas);
                 if (isNaN(limiteRojas)) limiteRojas = 99;
 
-                // --- PRE-CÁLCULO PARA NOTA MÍNIMA (Fuerza Bruta Exacta) ---
-                let sumaN_validas = 0; 
-                let sumaP_validas = 0; 
-                let sumaP_total = 0;   
-                
+                let sumaN_validas = 0; let sumaP_validas = 0; let sumaP_total = 0;   
                 ramo.evaluaciones.forEach(ev => {
                     let p = parseFloat(ev.porcentaje) || 0;
                     let n;
@@ -576,23 +613,15 @@
                             let valid = ev.subNotas.map(x=>parseFloat(x)).filter(x=>!isNaN(x) && x>=1 && x<=7);
                             if(valid.length > 0) n = valid.reduce((a,b)=>a+b,0) / valid.length;
                         }
-                    } else {
-                        n = parseFloat(ev.nota);
-                    }
-                    
+                    } else { n = parseFloat(ev.nota); }
                     if (p > 0) {
                         sumaP_total += p;
-                        if (!isNaN(n) && n > 0) {
-                            sumaN_validas += (n * (p / 100));
-                            sumaP_validas += p;
-                        }
+                        if (!isNaN(n) && n > 0) { sumaN_validas += (n * (p / 100)); sumaP_validas += p; }
                     }
                 });
 
                 let porcentajeFaltantePara100 = 100 - sumaP_validas; 
-                let notaMinimaPendiente = "";
-                let notaMinimaCruda = 0;
-                let epsilon = 0.000001; 
+                let notaMinimaPendiente = ""; let notaMinimaCruda = 0; let epsilon = 0.000001; 
                 
                 if (porcentajeFaltantePara100 > 0 && porcentajeFaltantePara100 <= 100) {
                     let encontrada = false;
@@ -600,118 +629,82 @@
                         let notaPrueba = p_test / 10;
                         let sumaSimulada = sumaN_validas + (notaPrueba * (porcentajeFaltantePara100 / 100));
                         let notaFinalSimulada = Math.round((sumaSimulada + epsilon) * 10) / 10;
-                        
                         if (notaFinalSimulada >= notaReq) {
                             notaMinimaCruda = notaPrueba;
                             notaMinimaPendiente = "Mín " + notaMinimaCruda.toFixed(1);
-                            encontrada = true;
-                            break;
+                            encontrada = true; break;
                         }
                     }
-                    
-                    if (!encontrada) {
-                        notaMinimaCruda = 8.0; 
-                        notaMinimaPendiente = "Imp."; 
-                    }
+                    if (!encontrada) { notaMinimaCruda = 8.0; notaMinimaPendiente = "Imp."; }
                 }
-                // --- FIN PRE-CÁLCULO ---
 
-                let faltanNotas = false;
-                let notasRojasCount = 0;
-                let htmlEvaluaciones = '';
+                let faltanNotas = false; let notasRojasCount = 0; let htmlEvaluaciones = '';
 
                 ramo.evaluaciones.forEach((ev, j) => {
                     let n;
-                    // --- GRUPO PONDERADO (EJ: RA) ---
                     if (ev.esGrupoPonderado) {
                         if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
-
-                        let sumPonderada = 0;
-                        let sumPorcentajesValidos = 0;
-                        let totalPorcentajeSuma = 0;
-
+                        let sumPonderada = 0; let sumPorcentajesValidos = 0; let totalPorcentajeSuma = 0;
                         ev.subNotasPonderadas.forEach(sub => {
-                            let sn = parseFloat(sub.nota);
-                            let sp = parseFloat(sub.porcentaje) || 0;
+                            let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0;
                             totalPorcentajeSuma += sp;
-                            if (!isNaN(sn) && sn > 0 && sp > 0) {
-                                sumPonderada += sn * (sp / 100);
-                                sumPorcentajesValidos += sp;
-                            }
+                            if (!isNaN(sn) && sn > 0 && sp > 0) { sumPonderada += sn * (sp / 100); sumPorcentajesValidos += sp; }
                         });
-
                         if (sumPorcentajesValidos > 0) {
                             ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(1);
                             n = parseFloat(ev.nota);
-                        } else {
-                            ev.nota = "";
-                            n = NaN;
-                        }
+                        } else { ev.nota = ""; n = NaN; }
                         
-                        let advertenciaPorcentaje = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
-                        
-                        // CORRECCIÓN: Mostrar nota mínima en el placeholder del promedio si está vacío
+                        let advP = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
                         let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
 
                         htmlEvaluaciones += `
                             <div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;">
                                 <div class="evaluacion-row">
                                     <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}>
-                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio ponderado calculado automáticamente">
-                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr} title="Porcentaje que vale todo este grupo en el ramo">
+                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio">
+                                    <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr}>
                                     <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                                 </div>
                                 <div class="sub-evaluacion-container" style="border-left-color: var(--naranja-muteado); margin-bottom: 0;">
-                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas con porcentaje propio ${advertenciaPorcentaje}</div>
+                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; font-weight: 600;">Notas propias ${advP}</div>
                                     ${ev.subNotasPonderadas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
                                             <input type="text" inputmode="decimal" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="${sub.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
                                             <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
-                                        </div>
-                                    `).join('')}
+                                        </div>`).join('')}
                                     <button class="btn-add-sub" onclick="addEvSubPond(${i},${j})" ${hideSt}>+ AÑADIR NOTA PONDERADA</button>
                                 </div>
-                            </div>
-                        `;
-                    }
-                    // --- GRUPO SIMPLE ---
-                    else if (ev.esGrupo) {
+                            </div>`;
+                    } else if (ev.esGrupo) {
                         if (!ev.subNotas) ev.subNotas = [""]; 
-                        
                         let validSubNotas = ev.subNotas.map(x => parseFloat(x)).filter(x => !isNaN(x) && x >= 1 && x <= 7);
                         let sumSub = validSubNotas.reduce((a, b) => a + b, 0);
-                        
                         ev.nota = validSubNotas.length > 0 ? (sumSub / validSubNotas.length).toFixed(1) : "";
                         n = parseFloat(ev.nota);
-                        
                         let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
                         
                         htmlEvaluaciones += `
                             <div style="margin-bottom: 25px;">
                                 <div class="evaluacion-row">
-                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: CONTROLES)" ${roAttr}>
-                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);" title="Promedio calculado automáticamente">
+                                    <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE" ${roAttr}>
+                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);">
                                     <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                     <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                                 </div>
                                 <div class="sub-evaluacion-container">
-                                    <div style="font-size: 0.75em; color: var(--gris-claro); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Ingresa las notas individuales (se promediarán arriba):</div>
                                     ${ev.subNotas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
-                                            <span style="color:var(--gris-oscuro); text-transform: uppercase; font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
+                                            <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
                                             <input type="text" inputmode="decimal" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="${sub === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button>
-                                        </div>
-                                    `).join('')}
+                                        </div>`).join('')}
                                     <button class="btn-add-sub" onclick="addEvSub(${i},${j})" ${hideSt}>+ AÑADIR TEST</button>
                                 </div>
-                            </div>
-                        `;
-                    } 
-                    // --- EVALUACIÓN NORMAL ---
-                    else {
+                            </div>`;
+                    } else {
                         n = parseFloat(ev.nota);
                         htmlEvaluaciones += `
                             <div class="evaluacion-row">
@@ -719,215 +712,99 @@
                                 <input type="text" inputmode="decimal" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="${ev.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'NOTA'}">
                                 <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                 <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
-                            </div>
-                        `;
+                            </div>`;
                     }
 
                     let p = parseFloat(ev.porcentaje) || 0;
-                    
-                    if ((ev.nombre.trim() !== "" || p > 0) && (isNaN(n) || ev.nota === "")) {
-                        faltanNotas = true;
-                    }
-
-                    if (!isNaN(n) && n > 0 && p > 0) {
-                        if (n < 4.0) notasRojasCount++;
-                    }
+                    if ((ev.nombre.trim() !== "" || p > 0) && (isNaN(n) || ev.nota === "")) faltanNotas = true;
+                    if (!isNaN(n) && n > 0 && p > 0) { if (n < 4.0) notasRojasCount++; }
                 });
 
-                // --- MENSAJE FINAL ---
                 let notaFinalRedondeada = Math.round((sumaN_validas + epsilon) * 10) / 10;
-                let msg = "";
-                let colorNotaFinal = "var(--verde-muteado)"; 
+                let msg = ""; let colorNotaFinal = "var(--verde-muteado)"; 
 
                 if (notasRojasCount > limiteRojas) {
-                    msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`;
-                    colorNotaFinal = "var(--rojo-muteado)"; 
-                } 
-                else if (sumaP_validas < 100) {
-                    if (sumaP_validas === 0) {
-                        msg = `<div class="nota-necesaria">INGRESA TUS NOTAS PARA CALCULAR EL PROMEDIO.</div>`;
-                    } else {
-                        if(notaMinimaCruda <= 1.0 && notaMinimaPendiente !== "") {
-                            msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO. ¡Ya te da el promedio!</div>`;
-                        } else if(notaMinimaCruda > 7.0) {
-                            msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS MÁS DE UN 7.0 - REPROBADO MATEMÁTICAMENTE.</div>`;
-                            colorNotaFinal = "var(--rojo-muteado)";
-                        } else {
-                            msg = `<div class="nota-necesaria">NECESITAS MÍNIMO UN ${notaMinimaCruda.toFixed(1)} EN EL ${porcentajeFaltantePara100.toFixed(0)}% RESTANTE.</div>`;
-                            let promParcial = Math.round(((sumaN_validas / (sumaP_validas / 100)) + epsilon) * 10) / 10;
-                            if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)";
-                        }
+                    msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`; colorNotaFinal = "var(--rojo-muteado)"; 
+                } else if (sumaP_validas < 100) {
+                    if (sumaP_validas === 0) msg = `<div class="nota-necesaria">INGRESA NOTAS PARA CALCULAR.</div>`;
+                    else {
+                        if(notaMinimaCruda <= 1.0 && notaMinimaPendiente !== "") msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`;
+                        else if(notaMinimaCruda > 7.0) { msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS > 7.0 - REPROBADO.</div>`; colorNotaFinal = "var(--rojo-muteado)"; }
+                        else { msg = `<div class="nota-necesaria">NECESITAS MÍNIMO ${notaMinimaCruda.toFixed(1)} EN EL ${porcentajeFaltantePara100.toFixed(0)}% RESTANTE.</div>`; let promParcial = Math.round(((sumaN_validas / (sumaP_validas / 100)) + epsilon) * 10) / 10; if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)"; }
                     }
-                } else if (sumaP_validas >= 100) {
-                    if (notaFinalRedondeada < notaReq) {
-                        msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO (MÍNIMO: ${notaReq.toFixed(1)})</div>`;
-                        colorNotaFinal = "var(--rojo-muteado)";
-                    } else {
-                        msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`;
-                    }
+                } else {
+                    if (notaFinalRedondeada < notaReq) { msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO.</div>`; colorNotaFinal = "var(--rojo-muteado)"; }
+                    else { msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO.</div>`; }
                 }
 
                 let err = sumaP_total > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP_total}%.</div>` : '';
-                
                 let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
                 let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
 
                 cont.innerHTML += `
                     <div>
                         <div class="ramo-header-acordeon ${claseAbierto}" onclick="toggleAcordeon(this, 'cuerpo-ramo-${i}')">
-                            <div class="titulo-wrapper" onclick="if(!modoBloqueado) event.stopPropagation()">
-                                <input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}>
-                            </div>
-                            <div class="header-actions">
-                                <button class="btn-remove btn-remove-ramo" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button>
-                                <div style="padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                    <span class="arrow"></span>
-                                </div>
-                            </div>
+                            <div class="titulo-wrapper" onclick="if(!modoBloqueado) event.stopPropagation()"><input type="text" value="${ramo.nombre}" onchange="actRamo(${i}, this.value)" placeholder="NOMBRE RAMO" ${roAttr}></div>
+                            <div class="header-actions"><button class="btn-remove btn-remove-ramo" onclick="event.stopPropagation(); delRamo(${i})" ${hideSt}>ELIMINAR</button><div style="padding: 10px; cursor: pointer; display: flex;"><span class="arrow"></span></div></div>
                         </div>
-                        
                         <div id="cuerpo-ramo-${i}" class="ramo-body ${claseAbierto}">
                             <div class="ramo-config" ${hideSt}>
                                 <span><strong>RESTRICCIONES:</strong></span>
-                                <label title="Nota mínima para pasar">APROBACIÓN: 
-                                    <input type="number" step="0.1" min="1" max="7" value="${notaReq}" onchange="actRamoConfig(${i}, 'notaAprobacion', this.value)" ${roAttr}>
-                                </label>
-                                <label title="Máximo de notas menores a 4.0 permitidas">LÍMITE DE ROJAS: 
-                                    <input type="number" min="0" value="${limiteRojas}" onchange="actRamoConfig(${i}, 'maxRojas', this.value)" ${roAttr}>
-                                </label>
+                                <label>APROBACIÓN: <input type="number" step="0.1" min="1" max="7" value="${notaReq}" onchange="actRamoConfig(${i}, 'notaAprobacion', this.value)" ${roAttr}></label>
+                                <label>LÍMITE DE ROJAS: <input type="number" min="0" value="${limiteRojas}" onchange="actRamoConfig(${i}, 'maxRojas', this.value)" ${roAttr}></label>
                             </div>
-
-                            <div>
-                                ${htmlEvaluaciones}
-                            </div>
-                            
+                            <div>${htmlEvaluaciones}</div>
                             <div class="botones-agregar" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
                                 <button class="btn-add-eval" onclick="addEv(${i})" ${hideSt}>+ AGREGAR EVALUACIÓN</button>
-                                <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ AGREGAR GRUPO DE TESTS</button>
-                                <button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO PONDERADO (EJ: RA)</button>
+                                <button class="btn-add-grupo" onclick="addEvGrupo(${i})" ${hideSt}>+ GRUPO TESTS</button>
+                                <button class="btn-add-grupo-pond" onclick="addEvGrupoPonderado(${i})" ${hideSt}>+ GRUPO POND (EJ: RA)</button>
                             </div>
-
                             <div class="resultados">
-                                <div><div style="color: var(--gris-claro);">TOTAL PONDERADO CONFIGURADO: <strong style="color: var(--negro);">${sumaP_total}%</strong></div>${msg}${err}</div>
-                                <div class="nota-final" style="color: ${colorNotaFinal}">
-                                    ${htmlFaltanNotas}
-                                    ${sumaN_validas > 0 ? sumaN_validas.toFixed(2) : '0.00'}
-                                </div>
+                                <div><div style="color: var(--gris-claro);">TOTAL PONDERADO: <strong style="color: var(--negro);">${sumaP_total}%</strong></div>${msg}${err}</div>
+                                <div class="nota-final" style="color: ${colorNotaFinal}">${htmlFaltanNotas}${sumaN_validas > 0 ? sumaN_validas.toFixed(2) : '0.00'}</div>
                             </div>
                         </div>
                     </div>`;
             });
-            guardarDatosNotas(); 
+            // NO auto-guardar aqui para evitar loop infinito en escritura rapida. Se guarda con interaccion en botones.
         }
 
         function agregarRamo() { 
-            let notaApp = prompt("¿Con qué nota se aprueba este ramo? (Ej: 4.0, 4.5)", "4.0");
-            if (notaApp === null) return; 
-            
-            let rojas = prompt("¿Cuántas notas rojas (< 4.0) MÁXIMO puedes tener antes de reprobar automáticamente?\n(Deja vacío o pon 99 si no hay límite)", "99");
-            if (rojas === null) return; 
-
-            let maxR = parseInt(rojas);
-            if (isNaN(maxR) || rojas.trim() === "") maxR = 99;
-
-            ramos.push({ 
-                nombre: "", 
-                notaAprobacion: parseFloat(notaApp) || 4.0,
-                maxRojas: maxR,
-                evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] 
-            }); 
-            renderizarNotas(); 
+            let notaApp = prompt("¿Con qué nota se aprueba este ramo? (Ej: 4.0)", "4.0"); if (notaApp === null) return; 
+            let rojas = prompt("¿Límite de rojas? (0 para no permitir ninguna, 99 sin límite)", "99"); if (rojas === null) return; 
+            let maxR = parseInt(rojas); if (isNaN(maxR) || rojas.trim() === "") maxR = 99;
+            ramos.push({ nombre: "", notaAprobacion: parseFloat(notaApp) || 4.0, maxRojas: maxR, evaluaciones: [{ nombre: "", nota: "", porcentaje: "" }] }); 
+            renderizarNotas(); guardarDatosGlobal();
         }
-
-        function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); } }
-        function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); }
-        
-        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); }
-        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); }
-        
-        function addEvGrupoPonderado(i) { 
-            ramos[i].evaluaciones.push({ 
-                nombre: "RA 1", nota: "", porcentaje: "", 
-                esGrupo: false, esGrupoPonderado: true, 
-                subNotasPonderadas: [{ nota: "", porcentaje: "60" }, { nota: "", porcentaje: "40" }] 
-            }); 
-            renderizarNotas(); 
-        }
-
-        function delEv(i, j) { ramos[i].evaluaciones.splice(j, 1); renderizarNotas(); }
+        function delRamo(i) { if(confirm("¿Borrar ramo?")) { ramos.splice(i, 1); renderizarNotas(); guardarDatosGlobal();} }
+        function actRamo(i, v) { ramos[i].nombre = v; renderizarNotas(); guardarDatosGlobal();}
+        function addEv(i) { ramos[i].evaluaciones.push({ nombre: "", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: false }); renderizarNotas(); guardarDatosGlobal();}
+        function addEvGrupo(i) { ramos[i].evaluaciones.push({ nombre: "Promedio Tests", nota: "", porcentaje: "", esGrupo: true, esGrupoPonderado: false, subNotas: [""] }); renderizarNotas(); guardarDatosGlobal();}
+        function addEvGrupoPonderado(i) { ramos[i].evaluaciones.push({ nombre: "RA 1", nota: "", porcentaje: "", esGrupo: false, esGrupoPonderado: true, subNotasPonderadas: [{ nota: "", porcentaje: "60" }, { nota: "", porcentaje: "40" }] }); renderizarNotas(); guardarDatosGlobal();}
+        function delEv(i, j) { ramos[i].evaluaciones.splice(j, 1); renderizarNotas(); guardarDatosGlobal();}
         
         function actEv(i, j, c, v) { 
             if (c === 'nota' && v !== "") {
-                v = v.replace(',', '.'); 
-                let num = parseFloat(v);
-                if (isNaN(num) || num < 1 || num > 7) {
-                    alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
-                    v = ""; 
-                } else {
-                    v = num; 
-                }
+                v = v.replace(',', '.'); let num = parseFloat(v);
+                if (isNaN(num) || num < 1 || num > 7) { alert("Nota no válida."); v = ""; } else { v = num; }
             }
-            ramos[i].evaluaciones[j][c] = v; 
-            renderizarNotas(); 
+            ramos[i].evaluaciones[j][c] = v; renderizarNotas(); guardarDatosGlobal();
         }
-
-        function addEvSub(i, j) {
-            ramos[i].evaluaciones[j].subNotas.push("");
-            renderizarNotas();
-        }
-
-        function delEvSub(i, j, k) {
-            ramos[i].evaluaciones[j].subNotas.splice(k, 1);
-            renderizarNotas();
-        }
-
+        function addEvSub(i, j) { ramos[i].evaluaciones[j].subNotas.push(""); renderizarNotas(); guardarDatosGlobal();}
+        function delEvSub(i, j, k) { ramos[i].evaluaciones[j].subNotas.splice(k, 1); renderizarNotas(); guardarDatosGlobal();}
         function actEvSub(i, j, k, v) {
-            if (v !== "") {
-                v = v.replace(',', '.');
-                let num = parseFloat(v);
-                if (isNaN(num) || num < 1 || num > 7) {
-                    alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
-                    v = ""; 
-                } else {
-                    v = num;
-                }
-            }
-            ramos[i].evaluaciones[j].subNotas[k] = v;
-            renderizarNotas();
+            if (v !== "") { v = v.replace(',', '.'); let num = parseFloat(v); if (isNaN(num) || num < 1 || num > 7) { alert("Inválida."); v = ""; } else { v = num; } }
+            ramos[i].evaluaciones[j].subNotas[k] = v; renderizarNotas(); guardarDatosGlobal();
         }
-
-        function actEvSubPond(i, j, k, campo, v) {
-            if (campo === 'nota' && v !== "") {
-                v = v.replace(',', '.');
-                let num = parseFloat(v);
-                if (isNaN(num) || num < 1 || num > 7) { 
-                    alert("Nota no válida."); 
-                    v = ""; 
-                } else {
-                    v = num;
-                }
-            }
-            ramos[i].evaluaciones[j].subNotasPonderadas[k][campo] = v;
-            renderizarNotas();
+        function actEvSubPond(i, j, k, c, v) {
+            if (c === 'nota' && v !== "") { v = v.replace(',', '.'); let num = parseFloat(v); if (isNaN(num) || num < 1 || num > 7) { alert("Inválida."); v = ""; } else { v = num; } }
+            ramos[i].evaluaciones[j].subNotasPonderadas[k][c] = v; renderizarNotas(); guardarDatosGlobal();
         }
+        function addEvSubPond(i, j) { ramos[i].evaluaciones[j].subNotasPonderadas.push({nota: "", porcentaje: ""}); renderizarNotas(); guardarDatosGlobal();}
+        function delEvSubPond(i, j, k) { ramos[i].evaluaciones[j].subNotasPonderadas.splice(k, 1); renderizarNotas(); guardarDatosGlobal();}
 
-        function addEvSubPond(i, j) { 
-            ramos[i].evaluaciones[j].subNotasPonderadas.push({nota: "", porcentaje: ""}); 
-            renderizarNotas(); 
-        }
-
-        function delEvSubPond(i, j, k) { 
-            ramos[i].evaluaciones[j].subNotasPonderadas.splice(k, 1); 
-            renderizarNotas(); 
-        }
-
-        // ==========================================
-        // LÓGICA SECCIÓN 2: CALENDARIO Y FECHAS
-        // ==========================================
-        let fechaActual = new Date(); 
-        let mesActual = fechaActual.getMonth(); 
-        let anioActual = fechaActual.getFullYear();
-
+        // Calendario Lógica Visual Básica
+        let fechaActual = new Date(); let mesActual = fechaActual.getMonth(); let anioActual = fechaActual.getFullYear();
         const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
         const diasSemana = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
 
@@ -938,210 +815,496 @@
             renderizarCalendario();
         }
 
-        function obtenerNombreRamo(nombreCompleto) {
-            const partes = nombreCompleto.split('-');
-            return partes.length > 1 ? partes[1].trim() : nombreCompleto.trim();
-        }
-
         function renderizarCalendario() {
             const grid = document.getElementById('calendario-grid');
             document.getElementById('mes-anio-display').textContent = `${nombresMeses[mesActual]} ${anioActual}`;
             grid.innerHTML = '';
-            
             diasSemana.forEach(dia => { grid.innerHTML += `<div class="cal-day-name">${dia}</div>`; });
-
-            const primerDiaMes = new Date(anioActual, mesActual, 1).getDay();
-            const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
-
-            for (let i = 0; i < primerDiaMes; i++) { grid.innerHTML += `<div class="cal-cell empty"></div>`; }
-
-            let hoy = new Date();
-            for (let dia = 1; dia <= diasEnMes; dia++) {
-                let fechaFormateada = `${anioActual}-${String(mesActual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-                let eventosDelDia = eventosCalendario.filter(ev => ev.fecha === fechaFormateada);
-                
-                let htmlPuntos = eventosDelDia.map(ev => 
-                    `<div class="evento-punto" style="background-color: ${ev.color};" 
-                          onclick="abrirModal('${ev.nombre}', '${ev.fecha}', '${ev.color}')" 
-                          title="${ev.nombre}"></div>`
-                ).join('');
-
-                let contenedorPuntos = eventosDelDia.length > 0 ? `<div class="contenedor-puntos">${htmlPuntos}</div>` : '';
-                let esHoy = (dia === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear()) ? 'today' : '';
-
-                grid.innerHTML += `
-                    <div class="cal-cell ${esHoy}">
-                        <span class="cal-date">${dia}</span>
-                        ${contenedorPuntos}
-                    </div>`;
-            }
+            const primerDia = new Date(anioActual, mesActual, 1).getDay();
+            const diasMes = new Date(anioActual, mesActual + 1, 0).getDate();
+            for (let i = 0; i < primerDia; i++) grid.innerHTML += `<div class="cal-cell empty"></div>`;
             
-            actualizarLeyenda();
+            let hoy = new Date();
+            for (let dia = 1; dia <= diasMes; dia++) {
+                let fStr = `${anioActual}-${String(mesActual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                let evDia = eventosCalendario.filter(ev => ev.fecha === fStr);
+                let pts = evDia.map(ev => `<div class="evento-punto" style="background:${ev.color};" onclick="abrirModal('${ev.nombre}','${ev.fecha}','${ev.color}')" title="${ev.nombre}"></div>`).join('');
+                let esHoy = (dia === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear()) ? 'today' : '';
+                grid.innerHTML += `<div class="cal-cell ${esHoy}"><span class="cal-date">${dia}</span>${pts ? `<div class="contenedor-puntos">${pts}</div>` : ''}</div>`;
+            }
             renderizarListaEventos();
         }
 
-        function actualizarLeyenda() {
-            const contLeyenda = document.getElementById('leyenda-ramos');
-            contLeyenda.innerHTML = '';
-            let ramosUnicos = {};
-
-            eventosCalendario.forEach(ev => {
-                let ramo = obtenerNombreRamo(ev.nombre);
-                ramosUnicos[ramo] = ev.color;
-            });
-
-            if(Object.keys(ramosUnicos).length === 0) {
-                contLeyenda.innerHTML = '<span style="color:var(--gris-claro); font-size: 0.85em;">NO HAY RAMOS CON FECHAS ASIGNADAS.</span>';
-                return;
-            }
-
-            for (const [ramo, color] of Object.entries(ramosUnicos)) {
-                contLeyenda.innerHTML += `
-                    <div class="leyenda-item">
-                        <div class="leyenda-color" style="background-color: ${color};"></div>
-                        <span>${ramo}</span>
-                    </div>`;
-            }
-        }
-
         function renderizarListaEventos() {
-            const cont = document.getElementById('contenedor-lista-eventos');
-            cont.innerHTML = '';
+            const cont = document.getElementById('contenedor-lista-eventos'); cont.innerHTML = '';
             let ordenados = [...eventosCalendario].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-
-            if(ordenados.length === 0) {
-                cont.innerHTML = '<p style="color:var(--gris-claro); font-size:0.85em; text-align:center; text-transform: uppercase;">No hay evaluaciones registradas.</p>';
-                return;
-            }
-
+            if(ordenados.length === 0) { cont.innerHTML = '<p style="color:#888; font-size:0.85em; text-align:center;">Vacio.</p>'; return; }
             ordenados.forEach(ev => {
-                const [anio, mes, dia] = ev.fecha.split('-');
-                cont.innerHTML += `
-                    <div class="evento-item" style="border-left-color: ${ev.color}">
-                        <div class="evento-info">
-                            <span class="evento-titulo">${ev.nombre}</span>
-                            <span class="evento-fecha">${dia}/${mes}/${anio}</span>
-                        </div>
-                        <button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})" title="Borrar">&times;</button>
-                    </div>`;
+                const [a, m, d] = ev.fecha.split('-');
+                cont.innerHTML += `<div class="evento-item" style="border-left-color: ${ev.color}"><div class="evento-info"><span class="evento-titulo">${ev.nombre}</span><span class="evento-fecha">${d}/${m}/${a}</span></div><button class="btn-borrar-evento" onclick="borrarEvento(${ev.id})">&times;</button></div>`;
             });
         }
 
         function guardarNuevoEvento() {
-            const nombre = document.getElementById('ev-nombre').value;
-            const fecha = document.getElementById('ev-fecha').value;
-            const color = document.getElementById('ev-color').value;
-
-            if(!nombre || !fecha) { alert("Completa el nombre y la fecha."); return; }
-
-            eventosCalendario.push({ id: Date.now(), nombre, fecha, color });
-            guardarEventos(); 
-
-            const partes = nombre.split('-');
-            const tituloEv = partes[0].trim();
-            const nombreRamo = partes.length > 1 ? partes[1].trim() : 'General';
-
-            let ramoIndex = ramos.findIndex(r => r.nombre.toLowerCase() === nombreRamo.toLowerCase());
-            
-            if (ramoIndex !== -1) {
-                let evExiste = ramos[ramoIndex].evaluaciones.some(e => e.nombre.toLowerCase() === tituloEv.toLowerCase());
-                if (!evExiste) {
-                    ramos[ramoIndex].evaluaciones.push({ nombre: tituloEv, nota: "", porcentaje: "" });
-                }
-            } else {
-                ramos.push({ nombre: nombreRamo, notaAprobacion: 4.0, maxRojas: 99, evaluaciones: [{ nombre: tituloEv, nota: "", porcentaje: "" }] });
-            }
-            
-            renderizarNotas(); 
-            document.getElementById('ev-nombre').value = '';
-            document.getElementById('ev-fecha').value = '';
-            renderizarCalendario();
+            const nom = document.getElementById('ev-nombre').value; const fec = document.getElementById('ev-fecha').value; const col = document.getElementById('ev-color').value;
+            if(!nom || !fec) { alert("Completa nombre y fecha."); return; }
+            eventosCalendario.push({ id: Date.now(), nombre: nom, fecha: fec, color: col });
+            document.getElementById('ev-nombre').value = ''; document.getElementById('ev-fecha').value = '';
+            guardarDatosGlobal(); renderizarCalendario();
         }
+        function borrarEvento(id) { eventosCalendario = eventosCalendario.filter(ev => ev.id !== id); guardarDatosGlobal(); renderizarCalendario(); }
 
-        function borrarEvento(id) {
-            eventosCalendario = eventosCalendario.filter(ev => ev.id !== id);
-            guardarEventos();
-            renderizarCalendario();
-        }
-
-        // --- LÓGICA DE GESTIÓN DE FECHAS PENDIENTES ---
         function renderizarFechasPendientes() {
-            const cont = document.getElementById('contenedor-fechas-pendientes');
-            cont.innerHTML = '';
-
+            const cont = document.getElementById('contenedor-fechas-pendientes'); cont.innerHTML = '';
             ramos.forEach((ramo, i) => {
                 if (!ramo.nombre) return; 
-
-                let htmlEvaluaciones = '';
-                
+                let html = '';
                 ramo.evaluaciones.forEach(ev => {
                     if (!ev.nombre) return; 
-                    
-                    const busquedaExacta = `${ev.nombre.trim()} - ${ramo.nombre.trim()}`.toLowerCase();
-                    
-                    const eventoEncontrado = eventosCalendario.find(e => 
-                        e.nombre.toLowerCase() === busquedaExacta || 
-                        (e.nombre.toLowerCase().includes(ev.nombre.toLowerCase()) && e.nombre.toLowerCase().includes(ramo.nombre.toLowerCase()))
-                    );
+                    const qExact = `${ev.nombre.trim()} - ${ramo.nombre.trim()}`.toLowerCase();
+                    const enc = eventosCalendario.find(e => e.nombre.toLowerCase() === qExact || (e.nombre.toLowerCase().includes(ev.nombre.toLowerCase()) && e.nombre.toLowerCase().includes(ramo.nombre.toLowerCase())));
+                    let p = `<span class="pill-sin-fecha">SIN FECHA</span>`;
+                    if (enc) { const [a,m,d] = enc.fecha.split('-'); p = `<span class="pill-con-fecha">${d}/${m}/${a}</span>`; }
+                    html += `<div class="fila-fecha-pendiente"><span>${ev.nombre}</span>${p}</div>`;
+                });
+                if (html === '') html = '<div style="padding:15px; color:#888; font-size: 0.85em;">Vacío</div>';
+                cont.innerHTML += `<div><div class="acordeon-header" onclick="toggleAcordeon(this, 'fechas-ramo-${i}')"><h3><span class="icono-ramo"></span> ${ramo.nombre}</h3><span class="arrow"></span></div><div id="fechas-ramo-${i}" class="acordeon-body">${html}</div></div>`;
+            });
+        }
+        function abrirModal(nom, fec, col) {
+            const [a, m, d] = fec.split('-'); const part = nom.split('-');
+            document.getElementById('modal-titulo').innerText = part[0].trim(); document.getElementById('modal-titulo').style.color = col;
+            document.getElementById('modal-fecha').innerText = `${d}/${m}/${a}`;
+            let t = document.getElementById('modal-ramo-tag'); t.innerText = part.length>1?part[1].trim():'Eval'; t.style.backgroundColor = col;
+            document.getElementById('modal-evaluacion').classList.remove('oculto');
+        }
+        function cerrarModal() { document.getElementById('modal-evaluacion').classList.add('oculto'); }
 
-                    let pillHTML = `<span class="pill-sin-fecha">SIN FECHA ASIGNADA</span>`;
-                    if (eventoEncontrado) {
-                        const [anio, mes, dia] = eventoEncontrado.fecha.split('-');
-                        pillHTML = `<span class="pill-con-fecha">${dia}/${mes}/${anio}</span>`;
+
+        // ==========================================
+        // SECCIÓN 3: LÓGICA PREDICCIONES
+        // ==========================================
+
+        function formatDateParaMostrar(dateString) {
+            const d = new Date(dateString);
+            const dia = String(d.getDate()).padStart(2, '0');
+            const mes = String(d.getMonth()+1).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes}/${d.getFullYear()} a las ${hh}:${mm}`;
+        }
+
+        // --- Funciones para abrir y cerrar el Modal de Crear Evento ---
+        function abrirModalCrearEvento() {
+            document.getElementById('modal-crear-evento').classList.remove('oculto');
+        }
+
+        function cerrarModalCrearEvento() {
+            document.getElementById('modal-crear-evento').classList.add('oculto');
+        }
+
+        function crearEventoPrediccion() {
+            const tipo = document.getElementById('pred-nuevo-tipo').value;
+            const titulo = document.getElementById('pred-nuevo-titulo').value.trim();
+            const opA = document.getElementById('pred-nuevo-a').value.trim();
+            const opB = document.getElementById('pred-nuevo-b').value.trim();
+            const fecha = document.getElementById('pred-nuevo-fecha').value;
+            const horas = parseFloat(document.getElementById('pred-nuevo-horas').value) || 1;
+            
+            if (!titulo || !opA || !opB || !fecha) {
+                alert("Completa Título, Opción A, Opción B y Fecha obligatoriamente.");
+                return;
+            }
+
+            const nuevoEv = {
+                id: Date.now(),
+                tipo: tipo,
+                titulo: titulo,
+                opcionA: opA,
+                opcionB: opB,
+                fechaHora: fecha,
+                horasCierre: horas,
+                predicciones: [], 
+                resultadoCargado: false,
+                ganadorReal: "",
+                exactoReal: ""
+            };
+
+            eventosPredicciones.push(nuevoEv);
+            guardarDatosGlobal();
+
+            // Limpiar formulario y cerrar modal
+            document.getElementById('pred-nuevo-titulo').value = '';
+            document.getElementById('pred-nuevo-a').value = '';
+            document.getElementById('pred-nuevo-b').value = '';
+            document.getElementById('pred-nuevo-fecha').value = '';
+            cerrarModalCrearEvento();
+        }
+
+        function eliminarEventoPred(id) {
+            if(confirm("¿Eliminar este evento de pronósticos para siempre?")) {
+                let password = prompt("Clave de admin:");
+                if (password !== "cc") { alert("Clave incorrecta."); return; }
+                eventosPredicciones = eventosPredicciones.filter(e => e.id !== id);
+                guardarDatosGlobal();
+            }
+        }
+
+        function calcularEstadoPrediccion(ev) {
+            if (ev.resultadoCargado) return 'FINALIZADO';
+            const ahora = new Date();
+            const fechaEv = new Date(ev.fechaHora);
+            const fechaCierre = new Date(fechaEv.getTime() - (ev.horasCierre * 60 * 60 * 1000));
+            if (ahora >= fechaCierre) return 'CERRADO';
+            return 'ABIERTO';
+        }
+
+        function cambioMetodoMMA(selectEl, idSelectRound) {
+            const sRound = document.getElementById(idSelectRound);
+            if(selectEl.value === 'Decisión') {
+                sRound.style.display = 'none';
+                sRound.value = '';
+            } else {
+                sRound.style.display = 'block';
+            }
+        }
+
+        function seleccionarToggle(btn, selectorGroupClass, inputHiddenId, valor) {
+            document.querySelectorAll(`.${selectorGroupClass}`).forEach(el => el.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById(inputHiddenId).value = valor;
+        }
+
+        function guardarPrediccion(eventoId, tipo) {
+            const ev = eventosPredicciones.find(e => e.id === eventoId);
+            if(!ev || calcularEstadoPrediccion(ev) !== 'ABIERTO') { alert("El evento ya cerró o no existe."); return; }
+
+            const nombreInput = document.getElementById(`pred-nombre-${eventoId}`).value.trim();
+            const ganadorInput = document.getElementById(`pred-ganador-${eventoId}`).value;
+            
+            if(!nombreInput) { alert("Ingresa tu nombre."); return; }
+            if(!ganadorInput) { alert("Selecciona quién ganará."); return; }
+
+            let exactoFinal = "";
+            if (tipo === 'MMA-UFC') {
+                const met = document.getElementById(`pred-mma-metodo-${eventoId}`).value;
+                const rnd = document.getElementById(`pred-mma-round-${eventoId}`).value;
+                if (!met) { alert("Selecciona el método de victoria."); return; }
+                if (met !== 'Decisión' && !rnd) { alert("Selecciona el round."); return; }
+                exactoFinal = met === 'Decisión' ? "Decisión" : `${met} - ${rnd}`;
+            } else {
+                exactoFinal = document.getElementById(`pred-exacto-${eventoId}`).value.trim();
+                
+                // VALIDACIÓN LÓGICA Y DE FORMATO
+                const regexResultado = /^\d+\s*-\s*\d+$/;
+                if (!regexResultado.test(exactoFinal)) {
+                    alert("Formato inválido. Usa el formato 'Número-Número' (Ej: 2-1, 0-0).");
+                    return;
+                }
+                
+                const [golesA, golesB] = exactoFinal.split('-').map(n => parseInt(n.trim()));
+                let ganadorLogico = 'Empate';
+                if (golesA > golesB) ganadorLogico = 'A';
+                if (golesB > golesA) ganadorLogico = 'B';
+                
+                if (ganadorLogico !== ganadorInput) {
+                    let nombreGanadorElegido = ganadorInput === 'A' ? ev.opcionA : (ganadorInput === 'B' ? ev.opcionB : 'Empate');
+                    let nombreGanadorLogico = ganadorLogico === 'A' ? ev.opcionA : (ganadorLogico === 'B' ? ev.opcionB : 'Empate');
+                    alert(`Hay una contradicción. Elegiste como ganador a ${nombreGanadorElegido}, pero el resultado exacto (${exactoFinal}) indica que el ganador es ${nombreGanadorLogico}.`);
+                    return;
+                }
+            }
+
+            // Anti-trampa
+            localStorage.setItem('pred_username', nombreInput);
+            nombreUsuarioPred = nombreInput;
+
+            // Buscar si ya predijo para actualizar, sino agregar
+            let indicePred = ev.predicciones.findIndex(p => p.nombre.toLowerCase() === nombreInput.toLowerCase());
+            if (indicePred !== -1) {
+                ev.predicciones[indicePred].ganador = ganadorInput;
+                ev.predicciones[indicePred].exacto = exactoFinal;
+            } else {
+                ev.predicciones.push({
+                    nombre: nombreInput,
+                    ganador: ganadorInput,
+                    exacto: exactoFinal,
+                    puntos: 0
+                });
+            }
+
+            guardarDatosGlobal();
+            alert("¡Predicción guardada exitosamente!");
+        }
+
+        // --- Cargar resultado real (ADMIN) ---
+        function abrirModalResultadoPred(eventoId, tipo, opA, opB) {
+            let password = prompt("Clave para cargar resultado:");
+            if (password !== "cc") { alert("Clave incorrecta."); return; }
+
+            document.getElementById('modal-res-id').value = eventoId;
+            document.getElementById('modal-res-tipo').value = tipo;
+
+            const tCont = document.getElementById('modal-res-ganador-toggles');
+            tCont.innerHTML = `
+                <div class="pred-toggle group-modal-ganador" onclick="seleccionarToggle(this, 'group-modal-ganador', 'modal-res-ganador', 'A')">${opA}</div>
+                <div class="pred-toggle group-modal-ganador" onclick="seleccionarToggle(this, 'group-modal-ganador', 'modal-res-ganador', 'Empate')">EMPATE</div>
+                <div class="pred-toggle group-modal-ganador" onclick="seleccionarToggle(this, 'group-modal-ganador', 'modal-res-ganador', 'B')">${opB}</div>
+            `;
+            document.getElementById('modal-res-ganador').value = '';
+
+            const eCont = document.getElementById('modal-res-exacto-container');
+            if (tipo === 'MMA-UFC') {
+                eCont.innerHTML = `
+                    <label style="display:block; font-size: 0.85em; font-weight: 600; margin: 15px 0 8px;">MÉTODO EXACTO</label>
+                    <div class="pred-inputs-mma">
+                        <select id="modal-mma-metodo" style="width:100%; padding:10px; border:1px solid #ccc;" onchange="cambioMetodoMMA(this, 'modal-mma-round')">
+                            <option value="">Método...</option>
+                            <option value="KO/TKO">KO / TKO</option>
+                            <option value="Sumisión">Sumisión</option>
+                            <option value="Decisión">Decisión</option>
+                        </select>
+                        <select id="modal-mma-round" style="width:100%; padding:10px; border:1px solid #ccc;">
+                            <option value="">Round...</option>
+                            <option value="Round 1">Round 1</option>
+                            <option value="Round 2">Round 2</option>
+                            <option value="Round 3">Round 3</option>
+                            <option value="Round 4">Round 4</option>
+                            <option value="Round 5">Round 5</option>
+                        </select>
+                    </div>`;
+            } else {
+                eCont.innerHTML = `
+                    <label style="display:block; font-size: 0.85em; font-weight: 600; margin: 15px 0 8px;">RESULTADO EXACTO (EJ: 2-1)</label>
+                    <input type="text" id="modal-exacto-libre" style="width:100%; padding:10px; border:1px solid #ccc; box-sizing:border-box;">
+                `;
+            }
+
+            document.getElementById('modal-resultado-pred').classList.remove('oculto');
+        }
+
+        function cerrarModalPred() { document.getElementById('modal-resultado-pred').classList.add('oculto'); }
+
+        function guardarResultadoReal() {
+            const eventoId = parseInt(document.getElementById('modal-res-id').value);
+            const tipo = document.getElementById('modal-res-tipo').value;
+            const ev = eventosPredicciones.find(e => e.id === eventoId);
+            
+            const ganador = document.getElementById('modal-res-ganador').value;
+            if(!ganador) { alert("Selecciona el ganador."); return; }
+
+            let exacto = "";
+            if (tipo === 'MMA-UFC') {
+                const met = document.getElementById('modal-mma-metodo').value;
+                const rnd = document.getElementById('modal-mma-round').value;
+                if (!met) { alert("Falta método."); return; }
+                if (met !== 'Decisión' && !rnd) { alert("Falta round."); return; }
+                exacto = met === 'Decisión' ? "Decisión" : `${met} - ${rnd}`;
+            } else {
+                exacto = document.getElementById('modal-exacto-libre').value.trim();
+                
+                // VALIDACIÓN LÓGICA Y DE FORMATO PARA RESULTADO ADMIN
+                const regexResultado = /^\d+\s*-\s*\d+$/;
+                if (!regexResultado.test(exacto)) {
+                    alert("Formato inválido. Usa el formato 'Número-Número' (Ej: 2-1, 0-0).");
+                    return;
+                }
+                
+                const [golesA, golesB] = exacto.split('-').map(n => parseInt(n.trim()));
+                let ganadorLogico = 'Empate';
+                if (golesA > golesB) ganadorLogico = 'A';
+                if (golesB > golesA) ganadorLogico = 'B';
+                
+                if (ganadorLogico !== ganador) {
+                    let nombreGanadorElegido = ganador === 'A' ? ev.opcionA : (ganador === 'B' ? ev.opcionB : 'Empate');
+                    let nombreGanadorLogico = ganadorLogico === 'A' ? ev.opcionA : (ganadorLogico === 'B' ? ev.opcionB : 'Empate');
+                    alert(`Hay una contradicción. Elegiste como ganador a ${nombreGanadorElegido}, pero el resultado exacto (${exacto}) indica que el ganador es ${nombreGanadorLogico}.`);
+                    return;
+                }
+            }
+
+            ev.ganadorReal = ganador;
+            ev.exactoReal = exacto;
+            ev.resultadoCargado = true;
+
+            // Calcular puntos
+            ev.predicciones.forEach(p => {
+                p.puntos = 0;
+                if (p.exacto.toLowerCase() === exacto.toLowerCase()) {
+                    p.puntos = 2; // Acertó exacto
+                } else if (p.ganador === ganador) {
+                    p.puntos = 1; // Acertó solo ganador
+                }
+            });
+
+            cerrarModalPred();
+            guardarDatosGlobal();
+        }
+
+        function renderizarRanking() {
+            const cont = document.getElementById('contenedor-ranking');
+            let puntajes = {};
+
+            // Sumar puntos solo de eventos finalizados
+            eventosPredicciones.filter(e => e.resultadoCargado).forEach(ev => {
+                ev.predicciones.forEach(p => {
+                    const nomL = p.nombre.toUpperCase();
+                    if (!puntajes[nomL]) puntajes[nomL] = 0;
+                    puntajes[nomL] += p.puntos;
+                });
+            });
+
+            const arrayRank = Object.entries(puntajes).sort((a, b) => b[1] - a[1]);
+
+            if (arrayRank.length === 0) {
+                cont.innerHTML = '<div style="color:var(--gris-claro); font-size:0.9em; text-align:center; padding: 20px;">Aún no hay resultados finales cargados.</div>';
+                return;
+            }
+
+            let htmlT = `<table class="ranking-table"><tr><th>Jugador</th><th>Puntos Totales</th></tr>`;
+            arrayRank.forEach((item, index) => {
+                let medalHtml = '';
+                if(index === 0) medalHtml = `<span class="medal medal-1">1</span>`;
+                else if(index === 1) medalHtml = `<span class="medal medal-2">2</span>`;
+                else if(index === 2) medalHtml = `<span class="medal medal-3">3</span>`;
+                else medalHtml = `<span style="display:inline-block; width:24px; margin-right:10px; text-align:center; color:var(--gris-claro); font-size:0.8em;">${index+1}</span>`;
+                
+                htmlT += `<tr><td>${medalHtml}${item[0]}</td><td style="color:var(--naranja-muteado); font-weight:700;">${item[1]} pts</td></tr>`;
+            });
+            htmlT += `</table>`;
+            cont.innerHTML = htmlT;
+        }
+
+        function renderizarPredicciones() {
+            const cont = document.getElementById('contenedor-pred-cartelera');
+            cont.innerHTML = '';
+            
+            // Ordenar: primero los abiertos/cerrados por fecha cercana, luego finalizados
+            let ordenados = [...eventosPredicciones].sort((a,b) => {
+                if (a.resultadoCargado !== b.resultadoCargado) return a.resultadoCargado ? 1 : -1;
+                return new Date(a.fechaHora) - new Date(b.fechaHora);
+            });
+
+            if (ordenados.length === 0) {
+                cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--gris-claro);">No hay eventos programados. Crea uno arriba.</div>';
+                renderizarRanking();
+                return;
+            }
+
+            ordenados.forEach(ev => {
+                const estado = calcularEstadoPrediccion(ev);
+                let colorBadge = "var(--naranja-muteado)";
+                if (ev.tipo === 'Fútbol') colorBadge = "var(--verde-muteado)";
+                if (ev.tipo === 'MMA-UFC') colorBadge = "var(--rojo-muteado)";
+
+                let colorEstado = "var(--verde-muteado)";
+                if (estado === 'CERRADO') colorEstado = "var(--gris-claro)";
+                if (estado === 'FINALIZADO') colorEstado = "var(--negro)";
+
+                let subtitulo = `${ev.titulo} • ${formatDateParaMostrar(ev.fechaHora)}`;
+
+                let bodyHtml = '';
+
+                if (estado === 'ABIERTO') {
+                    // Formulario
+                    let yaPredijo = ''; 
+                    if (nombreUsuarioPred) {
+                        let obj = ev.predicciones.find(p => p.nombre.toLowerCase() === nombreUsuarioPred.toLowerCase());
+                        if (obj) yaPredijo = 'ACTUALIZAR ';
                     }
 
-                    htmlEvaluaciones += `
-                        <div class="fila-fecha-pendiente">
-                            <span>${ev.nombre}</span>
-                            ${pillHTML}
+                    bodyHtml = `
+                        <div class="form-grupo">
+                            <label>Tu Nombre</label>
+                            <input type="text" id="pred-nombre-${ev.id}" placeholder="EJ: JUAN PÉREZ" value="${nombreUsuarioPred}" ${nombreUsuarioPred ? 'readonly style="background:#f9f9f9; color:#666;"' : ''}>
                         </div>
+                        <div class="form-grupo">
+                            <label>¿Quién Gana?</label>
+                            <div class="pred-toggles">
+                                <div class="pred-toggle group-${ev.id}" onclick="seleccionarToggle(this, 'group-${ev.id}', 'pred-ganador-${ev.id}', 'A')">${ev.opcionA}</div>
+                                <div class="pred-toggle group-${ev.id}" onclick="seleccionarToggle(this, 'group-${ev.id}', 'pred-ganador-${ev.id}', 'Empate')">EMPATE</div>
+                                <div class="pred-toggle group-${ev.id}" onclick="seleccionarToggle(this, 'group-${ev.id}', 'pred-ganador-${ev.id}', 'B')">${ev.opcionB}</div>
+                            </div>
+                            <input type="hidden" id="pred-ganador-${ev.id}">
+                        </div>
+                        <div class="form-grupo">
+                            <label>Resultado Exacto</label>
+                            ${ev.tipo === 'MMA-UFC' ? `
+                                <div class="pred-inputs-mma">
+                                    <select id="pred-mma-metodo-${ev.id}" onchange="cambioMetodoMMA(this, 'pred-mma-round-${ev.id}')">
+                                        <option value="">Método...</option><option value="KO/TKO">KO / TKO</option><option value="Sumisión">Sumisión</option><option value="Decisión">Decisión</option>
+                                    </select>
+                                    <select id="pred-mma-round-${ev.id}">
+                                        <option value="">Round...</option><option value="Round 1">Round 1</option><option value="Round 2">Round 2</option><option value="Round 3">Round 3</option><option value="Round 4">Round 4</option><option value="Round 5">Round 5</option>
+                                    </select>
+                                </div>
+                            ` : `<input type="text" id="pred-exacto-${ev.id}" placeholder="Ej: 2-1, 3-0, etc.">`}
+                        </div>
+                        <button class="btn-pred-submit" onclick="guardarPrediccion(${ev.id}, '${ev.tipo}')">${yaPredijo}ENVIAR PREDICCIÓN</button>
                     `;
-                });
-
-                if (htmlEvaluaciones === '') {
-                    htmlEvaluaciones = '<div style="padding:15px; color:var(--gris-claro); font-size: 0.85em; text-transform: uppercase;">No hay evaluaciones registradas para este ramo.</div>';
+                } else if (estado === 'CERRADO') {
+                    bodyHtml = `
+                        <div class="pred-msg-cerrado">PREDICCIONES CERRADAS.<br><span style="font-size:0.8em; font-weight:400;">A la espera del resultado oficial.</span></div>
+                        <button class="btn-cargar-res" onclick="abrirModalResultadoPred(${ev.id}, '${ev.tipo}', '${ev.opcionA}', '${ev.opcionB}')">CARGAR RESULTADO REAL</button>
+                        ${generarListaPrediccionesHtml(ev.predicciones)}
+                    `;
+                } else if (estado === 'FINALIZADO') {
+                    let textGanador = ev.ganadorReal === 'A' ? ev.opcionA : (ev.ganadorReal === 'B' ? ev.opcionB : 'Empate');
+                    bodyHtml = `
+                        <div style="background:var(--negro); color:var(--blanco); padding:15px; text-align:center; border-radius:4px; margin-bottom: 20px;">
+                            <div style="font-size:0.8em; letter-spacing:1px; margin-bottom:5px; color:#aaa;">RESULTADO OFICIAL</div>
+                            <div class="font-anton" style="font-size:1.5em;">${textGanador}</div>
+                            <div style="color:var(--naranja-muteado); font-weight:600; font-size:0.9em; margin-top:5px;">${ev.exactoReal.toUpperCase()}</div>
+                        </div>
+                        ${generarListaPrediccionesHtml(ev.predicciones, true)}
+                    `;
                 }
 
-                let claseAbierto = '';
-
                 cont.innerHTML += `
-                    <div>
-                        <div class="acordeon-header ${claseAbierto}" onclick="toggleAcordeon(this, 'fechas-ramo-${i}')">
-                            <h3><span class="icono-ramo"></span> ${ramo.nombre}</h3>
-                            <span class="arrow"></span>
+                    <div class="pred-card">
+                        <div class="pred-poster">
+                            <button class="btn-del-evento-pred" onclick="eliminarEventoPred(${ev.id})" title="Borrar Evento">×</button>
+                            <div class="pred-badges">
+                                <span class="pred-badge" style="background-color: ${colorBadge};">${ev.tipo}</span>
+                                <span class="pred-badge" style="background-color: ${colorEstado};">${estado}</span>
+                            </div>
+                            <div class="pred-poster-content">
+                                <div class="pred-opcion font-anton">${ev.opcionA}</div>
+                                <div class="pred-vs font-anton">VS</div>
+                                <div class="pred-opcion font-anton">${ev.opcionB}</div>
+                                <div class="pred-meta">${subtitulo}</div>
+                            </div>
                         </div>
-                        <div id="fechas-ramo-${i}" class="acordeon-body ${claseAbierto}">
-                            ${htmlEvaluaciones}
+                        <div class="pred-body">
+                            ${bodyHtml}
                         </div>
                     </div>
                 `;
             });
+
+            renderizarRanking();
         }
 
-        // Lógica del Modal
-        function abrirModal(nombreCompleto, fecha, color) {
-            const [anio, mes, dia] = fecha.split('-');
-            const partes = nombreCompleto.split('-');
+        function generarListaPrediccionesHtml(preds, mostrarPuntos = false) {
+            if(!preds || preds.length === 0) return `<div class="pred-lista"><p style="color:#888;font-size:0.85em;text-align:center;">Nadie participó en este evento.</p></div>`;
             
-            const titulo = partes[0].trim();
-            const ramo = partes.length > 1 ? partes[1].trim() : 'Evaluación';
-
-            document.getElementById('modal-titulo').innerText = titulo;
-            document.getElementById('modal-titulo').style.color = color;
-            document.getElementById('modal-fecha').innerText = `${dia}/${mes}/${anio}`;
+            // Ordenar por puntos si es finalizado, si no alfabetico
+            let list = [...preds].sort((a,b) => mostrarPuntos ? b.puntos - a.puntos : a.nombre.localeCompare(b.nombre));
             
-            const tagRamo = document.getElementById('modal-ramo-tag');
-            tagRamo.innerText = ramo;
-            tagRamo.style.backgroundColor = color;
-
-            document.getElementById('modal-evaluacion').classList.remove('oculto');
+            let listhtml = list.map(p => {
+                let ganadorTxt = p.ganador === 'Empate' ? 'Empate' : `Ganador ${p.ganador}`;
+                let strPuntos = mostrarPuntos ? `<span class="pred-pts">+${p.puntos} pts</span>` : '';
+                return `
+                    <div class="pred-item">
+                        <div><strong>${p.nombre.toUpperCase()}</strong> <span style="color:#888;">(${ganadorTxt} / ${p.exacto})</span></div>
+                        ${strPuntos}
+                    </div>
+                `;
+            }).join('');
+            return `<div class="pred-lista"><h4>JUGADAS REGISTRADAS (${preds.length})</h4>${listhtml}</div>`;
         }
 
-        function cerrarModal() {
-            document.getElementById('modal-evaluacion').classList.add('oculto');
-        }
-
-        // --- INICIO DE APLICACIÓN CON SUPABASE ---
+        // --- INICIO APLICACIÓN ---
         cargarDatosDesdeNube();
 
     </script>
