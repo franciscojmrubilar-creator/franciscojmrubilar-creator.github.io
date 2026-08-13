@@ -139,6 +139,7 @@
 
         .input-nombre { flex: 2; width: 100%; }
         .input-nota { flex: 1; text-align: center; font-weight: 600; border: 1px solid var(--negro) !important; background-color: var(--blanco) !important;}
+        .input-nota::placeholder { font-weight: 400; color: #aaa; }
         .input-porcentaje { flex: 1; text-align: center; }
         
         /* Botones minimalistas */
@@ -549,17 +550,78 @@
             const hideSt = modoBloqueado ? 'style="display: none;"' : '';
 
             ramos.forEach((ramo, i) => {
-                let sumaN = 0, sumaP = 0;
-                let faltanNotas = false;
-                let notasRojasCount = 0;
-                
                 let notaReq = parseFloat(ramo.notaAprobacion) || 4.0;
                 let limiteRojas = parseInt(ramo.maxRojas);
                 if (isNaN(limiteRojas)) limiteRojas = 99;
 
+                // --- PRE-CÁLCULO PARA NOTA MÍNIMA (Fuerza Bruta Exacta) ---
+                let sumaN_validas = 0; 
+                let sumaP_validas = 0; 
+                let sumaP_total = 0;   
+                
+                ramo.evaluaciones.forEach(ev => {
+                    let p = parseFloat(ev.porcentaje) || 0;
+                    let n;
+                    if (ev.esGrupoPonderado) {
+                        let sumPond = 0, sumPV = 0;
+                        if(ev.subNotasPonderadas) {
+                            ev.subNotasPonderadas.forEach(sub => {
+                                let sn = parseFloat(sub.nota); let sp = parseFloat(sub.porcentaje) || 0;
+                                if (!isNaN(sn) && sn > 0 && sp > 0) { sumPond += sn * (sp/100); sumPV += sp; }
+                            });
+                        }
+                        if(sumPV > 0) n = sumPond / (sumPV/100);
+                    } else if (ev.esGrupo) {
+                        if(ev.subNotas) {
+                            let valid = ev.subNotas.map(x=>parseFloat(x)).filter(x=>!isNaN(x) && x>=1 && x<=7);
+                            if(valid.length > 0) n = valid.reduce((a,b)=>a+b,0) / valid.length;
+                        }
+                    } else {
+                        n = parseFloat(ev.nota);
+                    }
+                    
+                    if (p > 0) {
+                        sumaP_total += p;
+                        if (!isNaN(n) && n > 0) {
+                            sumaN_validas += (n * (p / 100));
+                            sumaP_validas += p;
+                        }
+                    }
+                });
+
+                let porcentajeFaltantePara100 = 100 - sumaP_validas; 
+                let notaMinimaPendiente = "";
+                let notaMinimaCruda = 0;
+                let epsilon = 0.000001; 
+                
+                if (porcentajeFaltantePara100 > 0 && porcentajeFaltantePara100 <= 100) {
+                    let encontrada = false;
+                    for (let p_test = 10; p_test <= 70; p_test++) {
+                        let notaPrueba = p_test / 10;
+                        let sumaSimulada = sumaN_validas + (notaPrueba * (porcentajeFaltantePara100 / 100));
+                        let notaFinalSimulada = Math.round((sumaSimulada + epsilon) * 10) / 10;
+                        
+                        if (notaFinalSimulada >= notaReq) {
+                            notaMinimaCruda = notaPrueba;
+                            notaMinimaPendiente = "Mín " + notaMinimaCruda.toFixed(1);
+                            encontrada = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!encontrada) {
+                        notaMinimaCruda = 8.0; 
+                        notaMinimaPendiente = "Imp."; 
+                    }
+                }
+                // --- FIN PRE-CÁLCULO ---
+
+                let faltanNotas = false;
+                let notasRojasCount = 0;
                 let htmlEvaluaciones = '';
 
                 ramo.evaluaciones.forEach((ev, j) => {
+                    let n;
                     // --- GRUPO PONDERADO (EJ: RA) ---
                     if (ev.esGrupoPonderado) {
                         if (!ev.subNotasPonderadas) ev.subNotasPonderadas = [{nota: "", porcentaje: "60"}, {nota: "", porcentaje: "40"}];
@@ -569,28 +631,33 @@
                         let totalPorcentajeSuma = 0;
 
                         ev.subNotasPonderadas.forEach(sub => {
-                            let n = parseFloat(sub.nota);
-                            let p = parseFloat(sub.porcentaje) || 0;
-                            totalPorcentajeSuma += p;
-                            if (!isNaN(n) && n > 0 && p > 0) {
-                                sumPonderada += n * (p / 100);
-                                sumPorcentajesValidos += p;
+                            let sn = parseFloat(sub.nota);
+                            let sp = parseFloat(sub.porcentaje) || 0;
+                            totalPorcentajeSuma += sp;
+                            if (!isNaN(sn) && sn > 0 && sp > 0) {
+                                sumPonderada += sn * (sp / 100);
+                                sumPorcentajesValidos += sp;
                             }
                         });
 
                         if (sumPorcentajesValidos > 0) {
-                            ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(2);
+                            ev.nota = (sumPonderada / (sumPorcentajesValidos / 100)).toFixed(1);
+                            n = parseFloat(ev.nota);
                         } else {
                             ev.nota = "";
+                            n = NaN;
                         }
                         
                         let advertenciaPorcentaje = totalPorcentajeSuma !== 100 ? `<span style="color:var(--rojo-muteado);">(Suman ${totalPorcentajeSuma}%)</span>` : '';
+                        
+                        // CORRECCIÓN: Mostrar nota mínima en el placeholder del promedio si está vacío
+                        let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
 
                         htmlEvaluaciones += `
                             <div style="margin-bottom: 25px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--beige-oscuro); border-radius: 4px;">
                                 <div class="evaluacion-row">
                                     <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: RA 1)" ${roAttr}>
-                                    <input type="number" class="input-nota" value="${ev.nota}" placeholder="PROMEDIO" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio ponderado calculado automáticamente">
+                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; color: var(--negro); font-weight: bold;" title="Promedio ponderado calculado automáticamente">
                                     <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="% FINAL" ${roAttr} title="Porcentaje que vale todo este grupo en el ramo">
                                     <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                                 </div>
@@ -599,8 +666,7 @@
                                     ${ev.subNotasPonderadas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); font-size: 0.85em; font-weight: 600; min-width: 60px;">Nota ${k+1}</span>
-                                            <!-- Nota no usa roAttr para permitir edición bloqueado -->
-                                            <input type="number" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="Nota" step="0.1" min="1" max="7">
+                                            <input type="text" inputmode="decimal" value="${sub.nota}" onchange="actEvSubPond(${i},${j},${k},'nota',this.value)" placeholder="${sub.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
                                             <input type="number" value="${sub.porcentaje}" onchange="actEvSubPond(${i},${j},${k},'porcentaje',this.value)" placeholder="%" style="width: 70px;" ${roAttr}>
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSubPond(${i},${j},${k})" ${hideSt}>X</button>
                                         </div>
@@ -614,16 +680,19 @@
                     else if (ev.esGrupo) {
                         if (!ev.subNotas) ev.subNotas = [""]; 
                         
-                        let validSubNotas = ev.subNotas.map(n => parseFloat(n)).filter(n => !isNaN(n) && n >= 1 && n <= 7);
+                        let validSubNotas = ev.subNotas.map(x => parseFloat(x)).filter(x => !isNaN(x) && x >= 1 && x <= 7);
                         let sumSub = validSubNotas.reduce((a, b) => a + b, 0);
                         
                         ev.nota = validSubNotas.length > 0 ? (sumSub / validSubNotas.length).toFixed(1) : "";
+                        n = parseFloat(ev.nota);
+                        
+                        let placeholderPromedio = (ev.nota === "" && notaMinimaPendiente !== "") ? notaMinimaPendiente : "PROMEDIO";
                         
                         htmlEvaluaciones += `
                             <div style="margin-bottom: 25px;">
                                 <div class="evaluacion-row">
                                     <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="NOMBRE (EJ: CONTROLES)" ${roAttr}>
-                                    <input type="number" class="input-nota" value="${ev.nota}" placeholder="PROMEDIO" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);" title="Promedio calculado automáticamente">
+                                    <input type="text" class="input-nota" value="${ev.nota}" placeholder="${placeholderPromedio}" readonly style="background-color: var(--bg-beige) !important; border-color: var(--beige-oscuro) !important; color: var(--gris-claro);" title="Promedio calculado automáticamente">
                                     <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                     <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                                 </div>
@@ -632,8 +701,7 @@
                                     ${ev.subNotas.map((sub, k) => `
                                         <div class="sub-evaluacion-row">
                                             <span style="color:var(--gris-oscuro); text-transform: uppercase; font-size: 0.85em; font-weight: 600;">Test ${k+1}</span>
-                                            <!-- Nota no usa roAttr -->
-                                            <input type="number" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="Nota" step="0.1" min="1" max="7">
+                                            <input type="text" inputmode="decimal" value="${sub}" onchange="actEvSub(${i},${j},${k},this.value)" placeholder="${sub === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'Nota'}">
                                             <button class="btn-remove btn-remove-sub" onclick="delEvSub(${i},${j},${k})" ${hideSt}>X</button>
                                         </div>
                                     `).join('')}
@@ -644,31 +712,30 @@
                     } 
                     // --- EVALUACIÓN NORMAL ---
                     else {
+                        n = parseFloat(ev.nota);
                         htmlEvaluaciones += `
                             <div class="evaluacion-row">
                                 <input type="text" class="input-nombre" value="${ev.nombre}" onchange="actEv(${i},${j},'nombre',this.value)" placeholder="EVALUACIÓN" ${roAttr}>
-                                <!-- Nota no usa roAttr -->
-                                <input type="number" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="NOTA" step="0.1" min="1" max="7">
+                                <input type="text" inputmode="decimal" class="input-nota" value="${ev.nota}" onchange="actEv(${i},${j},'nota',this.value)" placeholder="${ev.nota === '' && notaMinimaPendiente !== '' ? notaMinimaPendiente : 'NOTA'}">
                                 <input type="number" class="input-porcentaje" value="${ev.porcentaje}" onchange="actEv(${i},${j},'porcentaje',this.value)" placeholder="%" ${roAttr}>
                                 <button class="btn-remove" onclick="delEv(${i},${j})" ${hideSt}>ELIMINAR</button>
                             </div>
                         `;
                     }
 
-                    let n = parseFloat(ev.nota);
                     let p = parseFloat(ev.porcentaje) || 0;
                     
-                    if ((ev.nombre.trim() !== "" || p > 0) && (ev.nota === "" || isNaN(n))) {
+                    if ((ev.nombre.trim() !== "" || p > 0) && (isNaN(n) || ev.nota === "")) {
                         faltanNotas = true;
                     }
 
                     if (!isNaN(n) && n > 0 && p > 0) {
-                        sumaN += (n * (p / 100));
                         if (n < 4.0) notasRojasCount++;
                     }
-                    if (p > 0) sumaP += p;
                 });
 
+                // --- MENSAJE FINAL ---
+                let notaFinalRedondeada = Math.round((sumaN_validas + epsilon) * 10) / 10;
                 let msg = "";
                 let colorNotaFinal = "var(--verde-muteado)"; 
 
@@ -676,22 +743,23 @@
                     msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO: LÍMITE DE ROJAS EXCEDIDO (${notasRojasCount}/${limiteRojas})</div>`;
                     colorNotaFinal = "var(--rojo-muteado)"; 
                 } 
-                else if (sumaP < 100 && sumaP > 0) {
-                    let falta = 100 - sumaP;
-                    let nec = (notaReq - sumaN) / (falta/100);
-                    
-                    if(nec <= 1.0) {
-                        msg = `<div class="nota-necesaria">APROBADO.</div>`;
-                    } else if(nec > 7.0) {
-                        msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS UN ${nec.toFixed(1)} - REPROBADO.</div>`;
-                        colorNotaFinal = "var(--rojo-muteado)";
+                else if (sumaP_validas < 100) {
+                    if (sumaP_validas === 0) {
+                        msg = `<div class="nota-necesaria">INGRESA TUS NOTAS PARA CALCULAR EL PROMEDIO.</div>`;
                     } else {
-                        msg = `<div class="nota-necesaria">NECESITAS UN ${nec.toFixed(1)} EN EL ${falta}% RESTANTE PARA EL ${notaReq.toFixed(1)}.</div>`;
-                        let promParcial = sumaN / (sumaP / 100);
-                        if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)";
+                        if(notaMinimaCruda <= 1.0 && notaMinimaPendiente !== "") {
+                            msg = `<div class="nota-necesaria" style="color: var(--verde-muteado);">APROBADO. ¡Ya te da el promedio!</div>`;
+                        } else if(notaMinimaCruda > 7.0) {
+                            msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">NECESITAS MÁS DE UN 7.0 - REPROBADO MATEMÁTICAMENTE.</div>`;
+                            colorNotaFinal = "var(--rojo-muteado)";
+                        } else {
+                            msg = `<div class="nota-necesaria">NECESITAS MÍNIMO UN ${notaMinimaCruda.toFixed(1)} EN EL ${porcentajeFaltantePara100.toFixed(0)}% RESTANTE.</div>`;
+                            let promParcial = Math.round(((sumaN_validas / (sumaP_validas / 100)) + epsilon) * 10) / 10;
+                            if (promParcial < notaReq) colorNotaFinal = "var(--naranja-muteado)";
+                        }
                     }
-                } else if (sumaP === 100) {
-                    if (sumaN < notaReq) {
+                } else if (sumaP_validas >= 100) {
+                    if (notaFinalRedondeada < notaReq) {
                         msg = `<div class="nota-necesaria" style="color: var(--rojo-muteado);">REPROBADO (MÍNIMO: ${notaReq.toFixed(1)})</div>`;
                         colorNotaFinal = "var(--rojo-muteado)";
                     } else {
@@ -699,11 +767,9 @@
                     }
                 }
 
-                let err = sumaP > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP}%.</div>` : '';
+                let err = sumaP_total > 100 ? `<div class="alerta-porcentaje">ADVERTENCIA: SUMAN ${sumaP_total}%.</div>` : '';
                 
-                // Aplicar estado abierto solo si estaba abierto antes
                 let claseAbierto = ramosAbiertos.includes(i) ? 'abierto' : '';
-                
                 let htmlFaltanNotas = faltanNotas ? '<span style="font-size: 0.45em; color: var(--rojo-muteado); display: block; line-height: 1; letter-spacing: 1px;">FALTAN NOTAS</span>' : '';
 
                 cont.innerHTML += `
@@ -742,10 +808,10 @@
                             </div>
 
                             <div class="resultados">
-                                <div><div style="color: var(--gris-claro);">TOTAL PONDERADO INGRESADO: <strong style="color: var(--negro);">${sumaP}%</strong></div>${msg}${err}</div>
+                                <div><div style="color: var(--gris-claro);">TOTAL PONDERADO CONFIGURADO: <strong style="color: var(--negro);">${sumaP_total}%</strong></div>${msg}${err}</div>
                                 <div class="nota-final" style="color: ${colorNotaFinal}">
                                     ${htmlFaltanNotas}
-                                    ${sumaN > 0 ? sumaN.toFixed(2) : '0.00'}
+                                    ${sumaN_validas > 0 ? sumaN_validas.toFixed(2) : '0.00'}
                                 </div>
                             </div>
                         </div>
@@ -792,10 +858,13 @@
         
         function actEv(i, j, c, v) { 
             if (c === 'nota' && v !== "") {
+                v = v.replace(',', '.'); 
                 let num = parseFloat(v);
-                if (num < 1 || num > 7) {
+                if (isNaN(num) || num < 1 || num > 7) {
                     alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
                     v = ""; 
+                } else {
+                    v = num; 
                 }
             }
             ramos[i].evaluaciones[j][c] = v; 
@@ -814,10 +883,13 @@
 
         function actEvSub(i, j, k, v) {
             if (v !== "") {
+                v = v.replace(',', '.');
                 let num = parseFloat(v);
-                if (num < 1 || num > 7) {
+                if (isNaN(num) || num < 1 || num > 7) {
                     alert("Nota no válida. Por favor ingresa una nota entre 1 y 7.");
                     v = ""; 
+                } else {
+                    v = num;
                 }
             }
             ramos[i].evaluaciones[j].subNotas[k] = v;
@@ -826,8 +898,14 @@
 
         function actEvSubPond(i, j, k, campo, v) {
             if (campo === 'nota' && v !== "") {
+                v = v.replace(',', '.');
                 let num = parseFloat(v);
-                if (num < 1 || num > 7) { alert("Nota no válida."); v = ""; }
+                if (isNaN(num) || num < 1 || num > 7) { 
+                    alert("Nota no válida."); 
+                    v = ""; 
+                } else {
+                    v = num;
+                }
             }
             ramos[i].evaluaciones[j].subNotasPonderadas[k][campo] = v;
             renderizarNotas();
@@ -1024,7 +1102,6 @@
                     htmlEvaluaciones = '<div style="padding:15px; color:var(--gris-claro); font-size: 0.85em; text-transform: uppercase;">No hay evaluaciones registradas para este ramo.</div>';
                 }
 
-                // Iniciar siempre cerrados
                 let claseAbierto = '';
 
                 cont.innerHTML += `
